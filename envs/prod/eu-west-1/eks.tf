@@ -8,6 +8,8 @@ module "eks" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
+  bootstrap_self_managed_addons = true
+
   # Control plane logging
   enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
