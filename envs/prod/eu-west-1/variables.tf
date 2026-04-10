@@ -1,7 +1,9 @@
 variable "region" {
-  default = "eu-west-1"
+  description = "AWS region"
+  type        = string
 }
 
 variable "cluster_name" {
-  default = "namiview-dev"
+  description = "EKS cluster name"
+  type        = string
 }
