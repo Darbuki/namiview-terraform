@@ -17,17 +17,17 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
 
   access_entries = {
-    ci = {
-      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/namiview-terraform-ci"
-      policy_associations = {
-        cluster_admin = {
-          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-          access_scope = {
-            type = "cluster"
-          }
-        }
-      }
-    }
+    # ci = {
+    #   principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/namiview-terraform-ci"
+    #   policy_associations = {
+    #     cluster_admin = {
+    #       policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+    #       access_scope = {
+    #         type = "cluster"
+    #       }
+    #     }
+    #   }
+    # }
     dar = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/darNamiview"
       policy_associations = {
