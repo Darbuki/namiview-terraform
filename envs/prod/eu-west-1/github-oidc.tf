@@ -106,7 +106,9 @@ resource "aws_iam_policy" "github_actions_ci" {
           "iam:CreatePolicy", "iam:DeletePolicy", "iam:GetPolicy", "iam:GetPolicyVersion", "iam:ListPolicyVersions", "iam:CreatePolicyVersion", "iam:DeletePolicyVersion", "iam:TagPolicy", "iam:UntagPolicy",
           "iam:CreateOpenIDConnectProvider", "iam:DeleteOpenIDConnectProvider", "iam:GetOpenIDConnectProvider", "iam:TagOpenIDConnectProvider",
           "iam:ListInstanceProfilesForRole",
-          "iam:CreateServiceLinkedRole"
+          "iam:CreateServiceLinkedRole",
+          "iam:CreateInstanceProfile", "iam:DeleteInstanceProfile", "iam:GetInstanceProfile",
+          "iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile"
         ]
         Resource = "*"
       },
@@ -149,7 +151,15 @@ resource "aws_iam_policy" "github_actions_ci" {
       {
         Sid    = "KMS"
         Effect = "Allow"
-        Action = ["kms:CreateKey", "kms:DescribeKey", "kms:GetKeyPolicy", "kms:GetKeyRotationStatus", "kms:ListResourceTags", "kms:CreateAlias", "kms:DeleteAlias", "kms:ListAliases", "kms:TagResource"]
+        Action = ["kms:CreateKey", "kms:DescribeKey", "kms:GetKeyPolicy", "kms:PutKeyPolicy", "kms:GetKeyRotationStatus", "kms:ListResourceTags", "kms:CreateAlias", "kms:DeleteAlias", "kms:ListAliases", "kms:TagResource"]
+        Resource = "*"
+      },
+      {
+        Sid    = "EventBridge"
+        Effect = "Allow"
+        Action = ["events:PutRule", "events:DeleteRule", "events:DescribeRule",
+                  "events:PutTargets", "events:RemoveTargets", "events:ListTargetsByRule",
+                  "events:TagResource", "events:UntagResource", "events:ListTagsForResource"]
         Resource = "*"
       },
       {
