@@ -19,6 +19,11 @@ resource "aws_secretsmanager_secret" "mongodb" {
   description = "MongoDB connection credentials (Phase 4 — Atlas)"
 }
 
+resource "aws_secretsmanager_secret" "grafana" {
+  name        = "${var.cluster_name}/grafana"
+  description = "Grafana admin credentials"
+}
+
 # IRSA role for External Secrets Operator
 module "eso_irsa" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
@@ -53,7 +58,8 @@ resource "aws_iam_role_policy" "eso_secrets_access" {
           aws_secretsmanager_secret.dockerhub.arn,
           aws_secretsmanager_secret.jwt.arn,
           aws_secretsmanager_secret.google_creds.arn,
-          aws_secretsmanager_secret.mongodb.arn
+          aws_secretsmanager_secret.mongodb.arn,
+          aws_secretsmanager_secret.grafana.arn
         ]
       }
     ]
