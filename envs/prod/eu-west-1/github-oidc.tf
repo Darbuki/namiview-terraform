@@ -149,7 +149,7 @@ resource "aws_iam_policy" "github_actions_ci" {
       {
         Sid    = "KMS"
         Effect = "Allow"
-        Action = ["kms:CreateKey", "kms:DescribeKey", "kms:CreateAlias", "kms:DeleteAlias", "kms:ListAliases", "kms:TagResource"]
+        Action = ["kms:CreateKey", "kms:DescribeKey", "kms:GetKeyPolicy", "kms:GetKeyRotationStatus", "kms:ListResourceTags", "kms:CreateAlias", "kms:DeleteAlias", "kms:ListAliases", "kms:TagResource"]
         Resource = "*"
       },
       {
