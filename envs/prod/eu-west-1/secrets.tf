@@ -4,9 +4,19 @@ resource "aws_secretsmanager_secret" "dockerhub" {
   description = "DockerHub credentials for image pulls"
 }
 
-resource "aws_secretsmanager_secret" "namiview_app" {
-  name        = "${var.cluster_name}/namiview-app"
-  description = "Namiview application secrets (API keys, DB connection strings, etc.)"
+resource "aws_secretsmanager_secret" "jwt" {
+  name        = "${var.cluster_name}/jwt"
+  description = "JWT signing secret"
+}
+
+resource "aws_secretsmanager_secret" "google_creds" {
+  name        = "${var.cluster_name}/google-creds"
+  description = "Google OAuth credentials JSON"
+}
+
+resource "aws_secretsmanager_secret" "mongodb" {
+  name        = "${var.cluster_name}/mongodb"
+  description = "MongoDB connection credentials (Phase 4 — Atlas)"
 }
 
 # IRSA role for External Secrets Operator
@@ -41,7 +51,9 @@ resource "aws_iam_role_policy" "eso_secrets_access" {
         ]
         Resource = [
           aws_secretsmanager_secret.dockerhub.arn,
-          aws_secretsmanager_secret.namiview_app.arn
+          aws_secretsmanager_secret.jwt.arn,
+          aws_secretsmanager_secret.google_creds.arn,
+          aws_secretsmanager_secret.mongodb.arn
         ]
       }
     ]
