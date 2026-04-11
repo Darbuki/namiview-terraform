@@ -32,6 +32,8 @@ resource "kubernetes_manifest" "argocd_project" {
         { group = "apiextensions.k8s.io",      kind = "CustomResourceDefinition" },
         { group = "admissionregistration.k8s.io", kind = "MutatingWebhookConfiguration" },
         { group = "admissionregistration.k8s.io", kind = "ValidatingWebhookConfiguration" },
+        { group = "karpenter.sh",              kind = "NodePool" },
+        { group = "karpenter.k8s.aws",         kind = "EC2NodeClass" },
       ]
     }
   }

@@ -6,6 +6,11 @@ locals {
   k8s_server       = "https://kubernetes.default.svc"
 
 
+  # Karpenter
+  karpenter_namespace = "karpenter"
+  karpenter_version   = "1.4.0"
+  karpenter_node_role = "KarpenterNodeRole-${var.cluster_name}"
+
   common_tags = {
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
