@@ -98,7 +98,7 @@ resource "aws_iam_policy" "github_actions_ci" {
         Sid    = "IAM"
         Effect = "Allow"
         Action = [
-          "iam:CreateRole", "iam:DeleteRole", "iam:GetRole", "iam:UpdateRole",
+          "iam:CreateRole", "iam:DeleteRole", "iam:GetRole", "iam:UpdateRole", "iam:UpdateAssumeRolePolicy",
           "iam:TagRole", "iam:UntagRole", "iam:ListRoleTags",
           "iam:PassRole",
           "iam:AttachRolePolicy", "iam:DetachRolePolicy",
