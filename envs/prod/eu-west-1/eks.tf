@@ -14,20 +14,20 @@ module "eks" {
   # Access
   endpoint_public_access       = true
   endpoint_public_access_cidrs = ["0.0.0.0/0"]
-  enable_cluster_creator_admin_permissions = true
+  enable_cluster_creator_admin_permissions = false
 
   access_entries = {
-    # ci = {
-    #   principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/namiview-terraform-ci"
-    #   policy_associations = {
-    #     cluster_admin = {
-    #       policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-    #       access_scope = {
-    #         type = "cluster"
-    #       }
-    #     }
-    #   }
-    # }
+    ci = {
+      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/namiview-terraform-ci"
+      policy_associations = {
+        cluster_admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
     dar = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/darNamiview"
       policy_associations = {
@@ -46,7 +46,8 @@ module "eks" {
     coredns                = { most_recent = true }
     kube-proxy             = { most_recent = true }
     vpc-cni = {
-      most_recent = true
+      most_recent    = true
+      before_compute = true
       configuration_values = jsonencode({
         env = {
           ENABLE_PREFIX_DELEGATION = "true"
@@ -54,7 +55,10 @@ module "eks" {
       })
     }
     eks-pod-identity-agent = { most_recent = true }
-    aws-ebs-csi-driver     = { most_recent = true }
+    aws-ebs-csi-driver = {
+      most_recent              = true
+      service_account_role_arn = module.ebs_csi_irsa.iam_role_arn
+    }
   }
 
   # Static system node group
@@ -65,17 +69,24 @@ module "eks" {
       max_size       = 2
       desired_size   = 2
 
-      taints = {
-        system = {
-          key    = "CriticalAddonsOnly"
-          value  = "true"
-          effect = "NO_SCHEDULE"
-        }
-      }
-
       labels = {
         role = "system"
       }
+    }
+  }
+}
+
+module "ebs_csi_irsa" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.0"
+
+  role_name             = "${var.cluster_name}-ebs-csi-driver"
+  attach_ebs_csi_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
     }
   }
 }
