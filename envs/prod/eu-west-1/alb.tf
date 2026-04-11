@@ -48,3 +48,22 @@ resource "helm_release" "alb_controller" {
 
   depends_on = [module.eks]
 }
+
+# GitOps Bridge — passes AWS resource info into the cluster for ArgoCD to consume
+resource "kubernetes_config_map" "gitops_bridge" {
+  metadata {
+    name      = "gitops-bridge"
+    namespace = local.argocd_namespace
+  }
+
+  data = {
+    acm_certificate_arn = aws_acm_certificate.eks.arn
+    cluster_name        = var.cluster_name
+    region              = var.region
+    vpc_id              = module.vpc.vpc_id
+    s3_bucket_name      = aws_s3_bucket.namiview-prod-bucket.bucket
+    eso_irsa_role_arn   = module.eso_irsa.iam_role_arn
+  }
+
+  depends_on = [helm_release.argocd]
+}

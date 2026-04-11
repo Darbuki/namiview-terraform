@@ -10,7 +10,8 @@ resource "kubernetes_manifest" "argocd_project" {
       description = "Default project"
       sourceRepos = [
         local.gitops_repo,
-        local.charts_repo
+        local.charts_repo,
+        "https://charts.external-secrets.io"
       ]
       destinations = [{
         namespace = "*"
