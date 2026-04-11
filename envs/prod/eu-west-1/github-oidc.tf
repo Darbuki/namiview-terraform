@@ -22,11 +22,14 @@ data "aws_iam_policy_document" "github_actions_trust" {
       values   = ["sts.amazonaws.com"]
     }
 
-    # Only allow the main branch to assume this role
+    # main branch (plan) + production environment (apply)
     condition {
-      test     = "StringEquals"
+      test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:Darbuki/namiview-terraform:ref:refs/heads/main"]
+      values   = [
+        "repo:Darbuki/namiview-terraform:ref:refs/heads/main",
+        "repo:Darbuki/namiview-terraform:environment:production"
+      ]
     }
   }
 }
@@ -71,12 +74,24 @@ resource "aws_iam_policy" "github_actions_ci" {
         Resource = "*"
       },
       {
-        Sid    = "S3"
+        Sid    = "S3App"
         Effect = "Allow"
         Action = ["s3:*"]
         Resource = [
           "arn:aws:s3:::namiview-prod-bucket",
           "arn:aws:s3:::namiview-prod-bucket/*"
+        ]
+      },
+      {
+        Sid    = "S3State"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject", "s3:PutObject", "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::namiview-terraform-state",
+          "arn:aws:s3:::namiview-terraform-state/*"
         ]
       },
       {
@@ -88,7 +103,7 @@ resource "aws_iam_policy" "github_actions_ci" {
           "iam:PassRole",
           "iam:AttachRolePolicy", "iam:DetachRolePolicy",
           "iam:PutRolePolicy", "iam:GetRolePolicy", "iam:DeleteRolePolicy", "iam:ListRolePolicies", "iam:ListAttachedRolePolicies",
-          "iam:CreatePolicy", "iam:DeletePolicy", "iam:GetPolicy", "iam:GetPolicyVersion", "iam:ListPolicyVersions", "iam:CreatePolicyVersion", "iam:DeletePolicyVersion",
+          "iam:CreatePolicy", "iam:DeletePolicy", "iam:GetPolicy", "iam:GetPolicyVersion", "iam:ListPolicyVersions", "iam:CreatePolicyVersion", "iam:DeletePolicyVersion", "iam:TagPolicy", "iam:UntagPolicy",
           "iam:CreateOpenIDConnectProvider", "iam:DeleteOpenIDConnectProvider", "iam:GetOpenIDConnectProvider", "iam:TagOpenIDConnectProvider",
           "iam:ListInstanceProfilesForRole",
           "iam:CreateServiceLinkedRole"
@@ -123,6 +138,12 @@ resource "aws_iam_policy" "github_actions_ci" {
         Sid    = "STS"
         Effect = "Allow"
         Action = ["sts:GetCallerIdentity"]
+        Resource = "*"
+      },
+      {
+        Sid    = "SSM"
+        Effect = "Allow"
+        Action = ["ssm:GetParameter", "ssm:GetParameters"]
         Resource = "*"
       },
       {

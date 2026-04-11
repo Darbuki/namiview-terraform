@@ -13,9 +13,8 @@ module "eks" {
 
   # Access
   endpoint_public_access       = true
-  # NAT GW IP so in-cluster traffic can reach the API.
-  # Add your current IP via AWS Console when you need kubectl access.
-  endpoint_public_access_cidrs = ["${module.vpc.nat_public_ips[0]}/32"]
+  # TODO: When not actively working, restrict via Console to block public access.
+  # Long-term: private endpoint + VPN/bastion.
   enable_cluster_creator_admin_permissions = false
 
   access_entries = {
