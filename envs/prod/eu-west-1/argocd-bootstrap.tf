@@ -11,7 +11,8 @@ resource "kubernetes_manifest" "argocd_project" {
       sourceRepos = [
         local.gitops_repo,
         local.charts_repo,
-        "https://charts.external-secrets.io"
+        "https://charts.external-secrets.io",
+        "https://prometheus-community.github.io/helm-charts"
       ]
       destinations = [{
         namespace = "*"
