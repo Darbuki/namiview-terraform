@@ -14,14 +14,25 @@ resource "kubernetes_manifest" "argocd_project" {
         "https://charts.external-secrets.io",
         "https://prometheus-community.github.io/helm-charts"
       ]
-      destinations = [{
-        namespace = "*"
-        server    = local.k8s_server
-      }]
-      clusterResourceWhitelist = [{
-        group = "*"
-        kind  = "*"
-      }]
+      destinations = [
+        { namespace = "namiview",   server = local.k8s_server },
+        { namespace = "argocd",     server = local.k8s_server },
+        { namespace = "monitoring", server = local.k8s_server },
+        { namespace = "kube-system", server = local.k8s_server },
+        { namespace = "external-secrets", server = local.k8s_server },
+        { namespace = "karpenter",  server = local.k8s_server },
+      ]
+      # Only the cluster-scoped resources our apps actually create
+      clusterResourceWhitelist = [
+        { group = "",                          kind = "Namespace" },
+        { group = "rbac.authorization.k8s.io", kind = "ClusterRole" },
+        { group = "rbac.authorization.k8s.io", kind = "ClusterRoleBinding" },
+        { group = "external-secrets.io",       kind = "ClusterSecretStore" },
+        { group = "storage.k8s.io",            kind = "StorageClass" },
+        { group = "apiextensions.k8s.io",      kind = "CustomResourceDefinition" },
+        { group = "admissionregistration.k8s.io", kind = "MutatingWebhookConfiguration" },
+        { group = "admissionregistration.k8s.io", kind = "ValidatingWebhookConfiguration" },
+      ]
     }
   }
 

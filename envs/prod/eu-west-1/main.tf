@@ -4,6 +4,28 @@ resource "aws_s3_bucket" "namiview-prod-bucket" {
   bucket = "namiview-prod-bucket"
 }
 
+# Block all public access — belt-and-suspenders guard
+resource "aws_s3_bucket_public_access_block" "namiview" {
+  bucket = aws_s3_bucket.namiview-prod-bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# Encrypt at rest with SSE-S3 (free, no KMS key required)
+resource "aws_s3_bucket_server_side_encryption_configuration" "namiview" {
+  bucket = aws_s3_bucket.namiview-prod-bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+    bucket_key_enabled = true
+  }
+}
+
 # S3 Gateway VPC Endpoint — free, keeps S3 traffic off the internet
 resource "aws_vpc_endpoint" "s3" {
   vpc_id       = module.vpc.vpc_id
