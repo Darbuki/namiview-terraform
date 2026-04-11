@@ -1,4 +1,11 @@
 locals {
+  # ArgoCD
+  argocd_namespace = "argocd"
+  gitops_repo      = "https://github.com/Darbuki/namiviewk8s.git"
+  charts_repo      = "https://github.com/Darbuki/namiview-charts.git"
+  k8s_server       = "https://kubernetes.default.svc"
+
+
   common_tags = {
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
