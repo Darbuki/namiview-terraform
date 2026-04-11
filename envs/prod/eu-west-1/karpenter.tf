@@ -222,31 +222,24 @@ resource "helm_release" "karpenter" {
 
   create_namespace = true
 
-  set {
-    name  = "settings.clusterName"
-    value = module.eks.cluster_name
-  }
+  values = [yamlencode({
+    settings = {
+      clusterName       = module.eks.cluster_name
+      clusterEndpoint   = module.eks.cluster_endpoint
+      interruptionQueue = aws_sqs_queue.karpenter.name
+    }
 
-  set {
-    name  = "settings.clusterEndpoint"
-    value = module.eks.cluster_endpoint
-  }
+    serviceAccount = {
+      annotations = {
+        "eks.amazonaws.com/role-arn" = module.karpenter_irsa.iam_role_arn
+      }
+    }
 
-  set {
-    name  = "settings.interruptionQueue"
-    value = aws_sqs_queue.karpenter.name
-  }
-
-  set {
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.karpenter_irsa.iam_role_arn
-  }
-
-  # Run on the system managed node group, not on Karpenter-provisioned nodes
-  set {
-    name  = "nodeSelector.role"
-    value = "system"
-  }
+    # Run on the system managed node group, not on Karpenter-provisioned nodes
+    nodeSelector = {
+      role = "system"
+    }
+  })]
 
   depends_on = [
     module.eks,
