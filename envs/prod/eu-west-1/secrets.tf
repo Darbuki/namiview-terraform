@@ -24,6 +24,11 @@ resource "aws_secretsmanager_secret" "grafana" {
   description = "Grafana admin credentials"
 }
 
+resource "aws_secretsmanager_secret" "arc_github_token" {
+  name        = "${var.cluster_name}/arc-github-token"
+  description = "GitHub PAT for Actions Runner Controller"
+}
+
 # IRSA role for External Secrets Operator
 module "eso_irsa" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
@@ -59,7 +64,8 @@ resource "aws_iam_role_policy" "eso_secrets_access" {
           aws_secretsmanager_secret.jwt.arn,
           aws_secretsmanager_secret.google_creds.arn,
           aws_secretsmanager_secret.mongodb.arn,
-          aws_secretsmanager_secret.grafana.arn
+          aws_secretsmanager_secret.grafana.arn,
+          aws_secretsmanager_secret.arc_github_token.arn
         ]
       }
     ]

@@ -21,6 +21,8 @@ resource "kubernetes_manifest" "argocd_project" {
         { namespace = "kube-system", server = local.k8s_server },
         { namespace = "external-secrets", server = local.k8s_server },
         { namespace = "karpenter",  server = local.k8s_server },
+        { namespace = "arc-systems", server = local.k8s_server },
+        { namespace = "arc-runners", server = local.k8s_server },
       ]
       # Only the cluster-scoped resources our apps actually create
       clusterResourceWhitelist = [
