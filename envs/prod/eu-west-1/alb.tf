@@ -1,7 +1,7 @@
 # ACM certificate for EKS services
 resource "aws_acm_certificate" "eks" {
   domain_name               = "eks.namiview.com"
-  subject_alternative_names = ["*.eks.namiview.com"]
+  subject_alternative_names = ["grafana-eks.namiview.com", "argocd-eks.namiview.com"]
   validation_method         = "DNS"
 
   lifecycle {
