@@ -9,7 +9,8 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
 
   # Control plane logging
-  enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  # Only audit logs — the rest add cost with little value for a small project
+  enabled_log_types = ["audit"]
 
   # Access — private endpoint only, CI runners are inside the VPC
   endpoint_public_access       = false
@@ -66,9 +67,9 @@ module "eks" {
   eks_managed_node_groups = {
     system = {
       instance_types = ["t3.medium"]
-      min_size       = 3
-      max_size       = 4
-      desired_size   = 3
+      min_size       = 2
+      max_size       = 3
+      desired_size   = 2
 
       labels = {
         role = "system"
