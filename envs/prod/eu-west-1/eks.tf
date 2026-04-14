@@ -11,10 +11,9 @@ module "eks" {
   # Control plane logging
   enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
-  # Access
-  endpoint_public_access       = true
-  # TODO: When not actively working, restrict via Console to block public access.
-  # Long-term: private endpoint + VPN/bastion.
+  # Access — private endpoint only, CI runners are inside the VPC
+  endpoint_public_access       = false
+  endpoint_private_access      = true
   enable_cluster_creator_admin_permissions = false
 
   access_entries = {
