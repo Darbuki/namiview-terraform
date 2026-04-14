@@ -12,7 +12,8 @@ resource "kubernetes_manifest" "argocd_project" {
         local.gitops_repo,
         local.charts_repo,
         "https://charts.external-secrets.io",
-        "https://prometheus-community.github.io/helm-charts"
+        "https://prometheus-community.github.io/helm-charts",
+        "ghcr.io/actions/actions-runner-controller-charts"
       ]
       destinations = [
         { namespace = "namiview",   server = local.k8s_server },
