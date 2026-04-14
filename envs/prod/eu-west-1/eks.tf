@@ -12,8 +12,8 @@ module "eks" {
   # Only audit logs — the rest add cost with little value for a small project
   enabled_log_types = ["audit"]
 
-  # Access — private endpoint only, CI runners are inside the VPC
-  endpoint_public_access       = false
+  # Access — public for now, switch to private once spot + node issues are resolved
+  endpoint_public_access       = true
   endpoint_private_access      = true
   enable_cluster_creator_admin_permissions = false
 

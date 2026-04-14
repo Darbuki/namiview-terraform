@@ -1,5 +1,10 @@
 # --- Karpenter ---
 
+# Service-linked role for EC2 Spot — required before Karpenter can launch spot instances
+resource "aws_iam_service_linked_role" "spot" {
+  aws_service_name = "spot.amazonaws.com"
+}
+
 # Tag the EKS node security group so Karpenter can discover it
 resource "aws_ec2_tag" "karpenter_sg" {
   resource_id = module.eks.node_security_group_id
