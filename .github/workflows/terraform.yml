@@ -42,7 +42,11 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        run: |
+          curl -fsSL https://releases.hashicorp.com/terraform/1.12.1/terraform_1.12.1_linux_amd64.zip -o terraform.zip
+          unzip -o terraform.zip -d /usr/local/bin
+          rm terraform.zip
+          terraform version
 
       - name: Terraform Init
         run: terraform init
@@ -80,7 +84,11 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        run: |
+          curl -fsSL https://releases.hashicorp.com/terraform/1.12.1/terraform_1.12.1_linux_amd64.zip -o terraform.zip
+          unzip -o terraform.zip -d /usr/local/bin
+          rm terraform.zip
+          terraform version
 
       - name: Terraform Init
         run: terraform init
