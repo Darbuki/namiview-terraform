@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "github_actions_trust" {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values   = [
-        "repo:Darbuki/namiview-terraform:ref:refs/heads/*",
+        "repo:Darbuki/namiview-terraform:ref:refs/heads/main",
         "repo:Darbuki/namiview-terraform:pull_request",
         "repo:Darbuki/namiview-terraform:environment:production"
       ]
