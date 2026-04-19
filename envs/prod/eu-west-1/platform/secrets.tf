@@ -65,7 +65,12 @@ resource "aws_iam_role_policy" "eso_secrets_access" {
           aws_secretsmanager_secret.google_creds.arn,
           aws_secretsmanager_secret.mongodb.arn,
           aws_secretsmanager_secret.grafana.arn,
-          aws_secretsmanager_secret.arc_github_token.arn
+          aws_secretsmanager_secret.arc_github_token.arn,
+          # Foundation-layer secrets (managed in envs/prod/eu-west-1/foundation/).
+          # Referenced by ARN name pattern instead of remote_state to keep
+          # the two layers decoupled — the contract is the secret name.
+          "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:${var.cluster_name}/anthropic-api-key-*",
+          "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:${var.cluster_name}/triage-agent-github-pat-*"
         ]
       }
     ]
