@@ -1,20 +1,29 @@
-name: Terraform (platform)
+name: Terraform (foundation)
 
-# Platform layer — the EKS cluster and everything around it (VPC, ALB,
-# Karpenter, ArgoCD, GH OIDC role, S3 app bucket). Rebuildable on EKS
-# teardown. See envs/prod/eu-west-1/foundation/ for the persistent layer.
-
+# Foundation layer — persistent AWS state (Secrets Manager entries, etc.)
+# that must survive EKS teardowns. Separate state, separate cadence,
+# separate workflow from the workload layer in terraform.yml.
+#
+# Intentional differences from terraform.yml:
+#   - runs on ubuntu-latest (GitHub-hosted), NOT arc-runner-set-terraform.
+#     Foundation must be appliable BEFORE the cluster exists, so it can't
+#     depend on an in-cluster runner. OIDC works identically on hosted
+#     runners.
+#   - no `destroy` action. Every resource carries `prevent_destroy = true`
+#     and destroying the foundation is a deliberate out-of-band act.
+#   - path-filtered: only runs when foundation files change.
+#test run commit
 on:
   push:
     branches: ['**']
     paths:
-      - 'envs/prod/eu-west-1/platform/**'
-      - '.github/workflows/terraform.yml'
+      - 'envs/prod/eu-west-1/foundation/**'
+      - '.github/workflows/terraform-foundation.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'envs/prod/eu-west-1/platform/**'
-      - '.github/workflows/terraform.yml'
+      - 'envs/prod/eu-west-1/foundation/**'
+      - '.github/workflows/terraform-foundation.yml'
   workflow_dispatch:
     inputs:
       action:
@@ -23,7 +32,6 @@ on:
         options:
           - plan
           - apply
-          - destroy
         default: plan
 
 permissions:
@@ -32,29 +40,23 @@ permissions:
   pull-requests: write
 
 env:
-  TF_WORKING_DIR: envs/prod/eu-west-1/platform
+  TF_WORKING_DIR: envs/prod/eu-west-1/foundation
   AWS_REGION: eu-west-1
 
+# Serialize runs against the foundation state to avoid lock contention.
 concurrency:
-  group: terraform-platform-prod-eu-west-1
+  group: terraform-foundation-prod-eu-west-1
   cancel-in-progress: false
 
 jobs:
   plan:
-    runs-on: arc-runner-set-terraform
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ${{ env.TF_WORKING_DIR }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install AWS CLI
-        run: |
-          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscli.zip
-          unzip -q awscli.zip
-          sudo ./aws/install
-          rm -rf awscli.zip aws
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
@@ -70,24 +72,26 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Plan
-        if: github.event.inputs.action != 'destroy'
-        run: terraform plan -out=tfplan
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
 
-      - name: Terraform Plan (Destroy)
-        if: github.event.inputs.action == 'destroy'
-        run: terraform plan -destroy -out=tfplan
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan -input=false
 
       - name: Upload Plan
         uses: actions/upload-artifact@v4
         with:
-          name: tfplan
+          name: tfplan-foundation
           path: ${{ env.TF_WORKING_DIR }}/tfplan
+          retention-days: 7
 
   apply:
     needs: plan
-    if: github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'
-    runs-on: arc-runner-set-terraform
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply'
+    runs-on: ubuntu-latest
     environment: production
     defaults:
       run:
@@ -95,13 +99,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install AWS CLI
-        run: |
-          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscli.zip
-          unzip -q awscli.zip
-          sudo ./aws/install
-          rm -rf awscli.zip aws
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
@@ -120,8 +117,8 @@ jobs:
       - name: Download Plan
         uses: actions/download-artifact@v4
         with:
-          name: tfplan
+          name: tfplan-foundation
           path: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve -input=false tfplan

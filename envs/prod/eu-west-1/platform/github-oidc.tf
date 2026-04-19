@@ -22,12 +22,16 @@ data "aws_iam_policy_document" "github_actions_trust" {
       values   = ["sts.amazonaws.com"]
     }
 
-    # main branch (plan) + production environment (apply)
+    # Branch push (any branch) + PR plan + production environment (apply).
+    # `ref:refs/heads/*` covers main as well as feature branches — fine for
+    # a single-maintainer repo. Tighten to a prefix (e.g. `ref:refs/heads/feat/*`)
+    # if collaborators with push access are ever added.
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values   = [
         "repo:Darbuki/namiview-terraform:ref:refs/heads/main",
+        "repo:Darbuki/namiview-terraform:pull_request",
         "repo:Darbuki/namiview-terraform:environment:production"
       ]
     }
