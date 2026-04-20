@@ -12,9 +12,8 @@ module "eks" {
   # Only audit logs — the rest add cost with little value for a small project
   enabled_log_types = ["audit"]
 
-  # Access — private only, CI runs on ARC runners inside the VPC
-  endpoint_public_access       = false
-  endpoint_private_access      = true
+  endpoint_public_access                   = false
+  endpoint_private_access                  = true
   enable_cluster_creator_admin_permissions = false
 
   access_entries = {
@@ -42,10 +41,21 @@ module "eks" {
     }
   }
 
-  # EKS managed add-ons
+  # Own the `karpenter.sh/discovery` tag on the shared node security group.
+  # Declaring it here makes TF authoritative and eliminates the plan churn.
+  node_security_group_tags = {
+    "karpenter.sh/discovery" = var.cluster_name
+  }
+
+  # EKS managed add-ons.
+  # TODO: drift source #2 — `most_recent = true` re-resolves the latest
+  # published addon version on every plan. When AWS ships a new version,
+  # the plan quietly upgrades and can trigger a node group rollout (~15min
+  # apply). Pin versions explicitly once we've settled on a baseline, so
+  # upgrades become PR-reviewed events rather than apply-time surprises.
   addons = {
-    coredns                = { most_recent = true }
-    kube-proxy             = { most_recent = true }
+    coredns    = { most_recent = true }
+    kube-proxy = { most_recent = true }
     vpc-cni = {
       most_recent    = true
       before_compute = true
@@ -62,6 +72,13 @@ module "eks" {
       service_account_role_arn = module.ebs_csi_irsa.iam_role_arn
     }
   }
+
+  # TODO: drift source #3 — the module-internal
+  # `aws_iam_openid_connect_provider` shows a thumbprint diff on most plans
+  # because the `tls_certificate` data source re-reads AWS's OIDC cert and
+  # the thumbprint rotates. Benign but noisy. Can't set `lifecycle` on a
+  # resource inside the module from here; options are (a) ignore the noise,
+  # or (b) fork/wrap the module to add `ignore_changes = [thumbprint_list]`.
 
   # Static system node group
   eks_managed_node_groups = {
