@@ -17,6 +17,7 @@ resource "kubernetes_manifest" "argocd_project" {
       ]
       destinations = [
         { namespace = "namiview",   server = local.k8s_server },
+        { namespace = "namiview-agents", server = local.k8s_server },
         { namespace = "argocd",     server = local.k8s_server },
         { namespace = "monitoring", server = local.k8s_server },
         { namespace = "kube-system", server = local.k8s_server },
