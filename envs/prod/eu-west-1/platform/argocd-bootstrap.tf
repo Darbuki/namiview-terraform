@@ -13,7 +13,8 @@ resource "kubernetes_manifest" "argocd_project" {
         local.charts_repo,
         "https://charts.external-secrets.io",
         "https://prometheus-community.github.io/helm-charts",
-        "ghcr.io/actions/actions-runner-controller-charts"
+        "ghcr.io/actions/actions-runner-controller-charts",
+        "https://kedacore.github.io/charts"
       ]
       destinations = [
         { namespace = "namiview",   server = local.k8s_server },
@@ -25,6 +26,7 @@ resource "kubernetes_manifest" "argocd_project" {
         { namespace = "karpenter",  server = local.k8s_server },
         { namespace = "arc-systems", server = local.k8s_server },
         { namespace = "arc-runners", server = local.k8s_server },
+        { namespace = "keda",        server = local.k8s_server },
       ]
       # Only the cluster-scoped resources our apps actually create
       clusterResourceWhitelist = [
