@@ -40,6 +40,7 @@ resource "kubernetes_manifest" "argocd_project" {
         { group = "admissionregistration.k8s.io", kind = "ValidatingWebhookConfiguration" },
         { group = "karpenter.sh",              kind = "NodePool" },
         { group = "karpenter.k8s.aws",         kind = "EC2NodeClass" },
+        { group = "apiregistration.k8s.io",    kind = "APIService" },
       ]
     }
   }
