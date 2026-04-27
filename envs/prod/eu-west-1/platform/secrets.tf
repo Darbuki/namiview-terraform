@@ -70,7 +70,8 @@ resource "aws_iam_role_policy" "eso_secrets_access" {
           # Referenced by ARN name pattern instead of remote_state to keep
           # the two layers decoupled — the contract is the secret name.
           "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:${var.cluster_name}/anthropic-api-key-*",
-          "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:${var.cluster_name}/triage-agent-github-pat-*"
+          "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:${var.cluster_name}/triage-agent-github-pat-*",
+          "arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.account_id}:secret:${var.cluster_name}/tailscale-operator-oauth-*"
         ]
       }
     ]
