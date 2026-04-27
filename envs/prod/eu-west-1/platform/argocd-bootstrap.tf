@@ -43,6 +43,7 @@ resource "kubernetes_manifest" "argocd_project" {
         { group = "karpenter.sh", kind = "NodePool" },
         { group = "karpenter.k8s.aws", kind = "EC2NodeClass" },
         { group = "apiregistration.k8s.io", kind = "APIService" },
+        { group = "networking.k8s.io", kind = "IngressClass" },
       ]
     }
   }
