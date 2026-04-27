@@ -44,6 +44,12 @@ resource "kubernetes_manifest" "argocd_project" {
         { group = "karpenter.k8s.aws", kind = "EC2NodeClass" },
         { group = "apiregistration.k8s.io", kind = "APIService" },
         { group = "networking.k8s.io", kind = "IngressClass" },
+        # Tailscale operator's CRDs — Connector advertises subnet routes,
+        # ProxyClass customizes proxy pods, DNSConfig manages tailnet DNS.
+        # All cluster-scoped despite living "near" namespaces conceptually.
+        { group = "tailscale.com", kind = "Connector" },
+        { group = "tailscale.com", kind = "ProxyClass" },
+        { group = "tailscale.com", kind = "DNSConfig" },
       ]
     }
   }
