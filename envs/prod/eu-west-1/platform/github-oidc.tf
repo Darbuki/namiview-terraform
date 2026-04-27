@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "github_actions_trust" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = [
+      values = [
         "repo:Darbuki/namiview-terraform:ref:refs/heads/main",
         "repo:Darbuki/namiview-terraform:pull_request",
         "repo:Darbuki/namiview-terraform:environment:production"
@@ -51,9 +51,9 @@ resource "aws_iam_policy" "github_actions_ci" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "EKS"
-        Effect = "Allow"
-        Action = ["eks:*"]
+        Sid      = "EKS"
+        Effect   = "Allow"
+        Action   = ["eks:*"]
         Resource = "*"
       },
       {
@@ -117,53 +117,53 @@ resource "aws_iam_policy" "github_actions_ci" {
         Resource = "*"
       },
       {
-        Sid    = "SecretsManager"
-        Effect = "Allow"
-        Action = ["secretsmanager:*"]
+        Sid      = "SecretsManager"
+        Effect   = "Allow"
+        Action   = ["secretsmanager:*"]
         Resource = "arn:aws:secretsmanager:eu-west-1:${data.aws_caller_identity.current.account_id}:secret:namiview-prod/*"
       },
       {
-        Sid    = "ACM"
-        Effect = "Allow"
-        Action = ["acm:*"]
+        Sid      = "ACM"
+        Effect   = "Allow"
+        Action   = ["acm:*"]
         Resource = "*"
       },
       {
-        Sid    = "AutoScaling"
-        Effect = "Allow"
-        Action = ["autoscaling:*"]
+        Sid      = "AutoScaling"
+        Effect   = "Allow"
+        Action   = ["autoscaling:*"]
         Resource = "*"
       },
       {
-        Sid    = "CloudWatch"
-        Effect = "Allow"
-        Action = ["logs:*", "cloudwatch:*"]
+        Sid      = "CloudWatch"
+        Effect   = "Allow"
+        Action   = ["logs:*", "cloudwatch:*"]
         Resource = "*"
       },
       {
-        Sid    = "STS"
-        Effect = "Allow"
-        Action = ["sts:GetCallerIdentity"]
+        Sid      = "STS"
+        Effect   = "Allow"
+        Action   = ["sts:GetCallerIdentity"]
         Resource = "*"
       },
       {
-        Sid    = "SSM"
-        Effect = "Allow"
-        Action = ["ssm:GetParameter", "ssm:GetParameters"]
+        Sid      = "SSM"
+        Effect   = "Allow"
+        Action   = ["ssm:GetParameter", "ssm:GetParameters"]
         Resource = "*"
       },
       {
-        Sid    = "KMS"
-        Effect = "Allow"
-        Action = ["kms:CreateKey", "kms:DescribeKey", "kms:GetKeyPolicy", "kms:PutKeyPolicy", "kms:GetKeyRotationStatus", "kms:ListResourceTags", "kms:CreateAlias", "kms:DeleteAlias", "kms:ListAliases", "kms:TagResource"]
+        Sid      = "KMS"
+        Effect   = "Allow"
+        Action   = ["kms:CreateKey", "kms:DescribeKey", "kms:GetKeyPolicy", "kms:PutKeyPolicy", "kms:GetKeyRotationStatus", "kms:ListResourceTags", "kms:CreateAlias", "kms:DeleteAlias", "kms:ListAliases", "kms:TagResource"]
         Resource = "*"
       },
       {
         Sid    = "EventBridge"
         Effect = "Allow"
         Action = ["events:PutRule", "events:DeleteRule", "events:DescribeRule",
-                  "events:PutTargets", "events:RemoveTargets", "events:ListTargetsByRule",
-                  "events:TagResource", "events:UntagResource", "events:ListTagsForResource"]
+          "events:PutTargets", "events:RemoveTargets", "events:ListTargetsByRule",
+        "events:TagResource", "events:UntagResource", "events:ListTagsForResource"]
         Resource = "*"
       },
       {

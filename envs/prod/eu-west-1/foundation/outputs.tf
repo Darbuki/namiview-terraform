@@ -17,3 +17,13 @@ output "triage_agent_github_pat_secret_name" {
   description = "Name of the triage agent's GitHub PAT secret — stable reference for ExternalSecret manifests."
   value       = aws_secretsmanager_secret.triage_agent_github_pat.name
 }
+
+output "tailscale_operator_oauth_secret_arn" {
+  description = "ARN of the Tailscale operator OAuth client secret. Consumed by ExternalSecrets in-cluster (looked up by name pattern, not remote_state)."
+  value       = aws_secretsmanager_secret.tailscale_operator_oauth.arn
+}
+
+output "tailscale_operator_oauth_secret_name" {
+  description = "Name of the Tailscale operator OAuth client secret."
+  value       = aws_secretsmanager_secret.tailscale_operator_oauth.name
+}

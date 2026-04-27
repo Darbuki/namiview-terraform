@@ -14,33 +14,35 @@ resource "kubernetes_manifest" "argocd_project" {
         "https://charts.external-secrets.io",
         "https://prometheus-community.github.io/helm-charts",
         "ghcr.io/actions/actions-runner-controller-charts",
-        "https://kedacore.github.io/charts"
+        "https://kedacore.github.io/charts",
+        "https://pkgs.tailscale.com/helmcharts"
       ]
       destinations = [
-        { namespace = "namiview",   server = local.k8s_server },
+        { namespace = "namiview", server = local.k8s_server },
         { namespace = "namiview-agents", server = local.k8s_server },
-        { namespace = "argocd",     server = local.k8s_server },
+        { namespace = "argocd", server = local.k8s_server },
         { namespace = "monitoring", server = local.k8s_server },
         { namespace = "kube-system", server = local.k8s_server },
         { namespace = "external-secrets", server = local.k8s_server },
-        { namespace = "karpenter",  server = local.k8s_server },
+        { namespace = "karpenter", server = local.k8s_server },
         { namespace = "arc-systems", server = local.k8s_server },
         { namespace = "arc-runners", server = local.k8s_server },
-        { namespace = "keda",        server = local.k8s_server },
+        { namespace = "keda", server = local.k8s_server },
+        { namespace = "tailscale", server = local.k8s_server },
       ]
       # Only the cluster-scoped resources our apps actually create
       clusterResourceWhitelist = [
-        { group = "",                          kind = "Namespace" },
+        { group = "", kind = "Namespace" },
         { group = "rbac.authorization.k8s.io", kind = "ClusterRole" },
         { group = "rbac.authorization.k8s.io", kind = "ClusterRoleBinding" },
-        { group = "external-secrets.io",       kind = "ClusterSecretStore" },
-        { group = "storage.k8s.io",            kind = "StorageClass" },
-        { group = "apiextensions.k8s.io",      kind = "CustomResourceDefinition" },
+        { group = "external-secrets.io", kind = "ClusterSecretStore" },
+        { group = "storage.k8s.io", kind = "StorageClass" },
+        { group = "apiextensions.k8s.io", kind = "CustomResourceDefinition" },
         { group = "admissionregistration.k8s.io", kind = "MutatingWebhookConfiguration" },
         { group = "admissionregistration.k8s.io", kind = "ValidatingWebhookConfiguration" },
-        { group = "karpenter.sh",              kind = "NodePool" },
-        { group = "karpenter.k8s.aws",         kind = "EC2NodeClass" },
-        { group = "apiregistration.k8s.io",    kind = "APIService" },
+        { group = "karpenter.sh", kind = "NodePool" },
+        { group = "karpenter.k8s.aws", kind = "EC2NodeClass" },
+        { group = "apiregistration.k8s.io", kind = "APIService" },
       ]
     }
   }

@@ -168,21 +168,21 @@ resource "aws_iam_role_policy" "karpenter_controller" {
         Resource = "*"
       },
       {
-        Sid    = "PassRole"
-        Effect = "Allow"
-        Action = "iam:PassRole"
+        Sid      = "PassRole"
+        Effect   = "Allow"
+        Action   = "iam:PassRole"
         Resource = aws_iam_role.karpenter_node.arn
       },
       {
-        Sid    = "SSM"
-        Effect = "Allow"
-        Action = "ssm:GetParameter"
+        Sid      = "SSM"
+        Effect   = "Allow"
+        Action   = "ssm:GetParameter"
         Resource = "arn:aws:ssm:${var.region}::parameter/aws/service/*"
       },
       {
-        Sid    = "Pricing"
-        Effect = "Allow"
-        Action = ["pricing:GetProducts"]
+        Sid      = "Pricing"
+        Effect   = "Allow"
+        Action   = ["pricing:GetProducts"]
         Resource = "*"
       },
       {
@@ -196,9 +196,9 @@ resource "aws_iam_role_policy" "karpenter_controller" {
         Resource = aws_sqs_queue.karpenter.arn
       },
       {
-        Sid    = "EKS"
-        Effect = "Allow"
-        Action = ["eks:DescribeCluster"]
+        Sid      = "EKS"
+        Effect   = "Allow"
+        Action   = ["eks:DescribeCluster"]
         Resource = module.eks.cluster_arn
       },
       {
