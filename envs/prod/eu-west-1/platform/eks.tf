@@ -8,9 +8,7 @@ module "eks" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
-  # Control plane logging
-  # Only audit logs — the rest add cost with little value for a small project
-  enabled_log_types = ["audit"]
+  enabled_log_types = []
 
   endpoint_public_access                   = false
   endpoint_private_access                  = true
