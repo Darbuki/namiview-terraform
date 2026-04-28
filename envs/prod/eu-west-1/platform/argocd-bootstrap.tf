@@ -85,6 +85,8 @@ resource "kubernetes_manifest" "argocd_apps_root" {
     }
   }
 
+  computed_fields = ["spec.operation", "metadata.labels", "metadata.annotations", "metadata.finalizers"]
+
   depends_on = [kubernetes_manifest.argocd_project]
 }
 
@@ -115,6 +117,8 @@ resource "kubernetes_manifest" "argocd_infrastructure_root" {
       }
     }
   }
+
+  computed_fields = ["spec.operation", "metadata.labels", "metadata.annotations", "metadata.finalizers"]
 
   depends_on = [kubernetes_manifest.argocd_project]
 }
