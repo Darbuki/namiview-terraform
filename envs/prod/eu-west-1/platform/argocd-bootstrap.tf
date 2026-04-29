@@ -91,6 +91,39 @@ resource "kubernetes_manifest" "argocd_apps_root" {
   depends_on = [kubernetes_manifest.argocd_project]
 }
 
+resource "kubernetes_manifest" "argocd_apps_root_dev" {
+  manifest = {
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "Application"
+    metadata = {
+      name      = "apps-root-dev"
+      namespace = local.argocd_namespace
+    }
+    spec = {
+      project = "namiview"
+      source = {
+        repoURL        = local.gitops_repo
+        targetRevision = var.argocd_dev_target_revision
+        path           = "apps-eks-dev"
+      }
+      destination = {
+        server    = local.k8s_server
+        namespace = local.argocd_namespace
+      }
+      syncPolicy = {
+        automated = {
+          prune    = true
+          selfHeal = true
+        }
+      }
+    }
+  }
+
+  computed_fields = ["spec.operation", "metadata.labels", "metadata.annotations", "metadata.finalizers"]
+
+  depends_on = [kubernetes_manifest.argocd_project]
+}
+
 resource "kubernetes_manifest" "argocd_infrastructure_root" {
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
