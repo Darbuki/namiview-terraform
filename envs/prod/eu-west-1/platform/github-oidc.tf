@@ -31,6 +31,7 @@ data "aws_iam_policy_document" "github_actions_trust" {
       variable = "token.actions.githubusercontent.com:sub"
       values = [
         "repo:Darbuki/namiview-terraform:ref:refs/heads/main",
+        "repo:Darbuki/namiview-terraform:ref:refs/heads/86-async-job-queue-sqs-worker-5-variant-previewsave-flow",
         "repo:Darbuki/namiview-terraform:pull_request",
         "repo:Darbuki/namiview-terraform:environment:production"
       ]
