@@ -32,6 +32,7 @@ data "aws_iam_policy_document" "github_actions_trust" {
       values = [
         "repo:Darbuki/namiview-terraform:ref:refs/heads/main",
         "repo:Darbuki/namiview-terraform:ref:refs/heads/86-async-job-queue-sqs-worker-5-variant-previewsave-flow",
+        "repo:Darbuki/namiview-terraform:ref:refs/heads/88-bootstrap-dev-environment-in-eks-cluster-shape-2",
         "repo:Darbuki/namiview-terraform:pull_request",
         "repo:Darbuki/namiview-terraform:environment:production"
       ]
@@ -84,7 +85,9 @@ resource "aws_iam_policy" "github_actions_ci" {
         Action = ["s3:*"]
         Resource = [
           "arn:aws:s3:::namiview-prod-bucket",
-          "arn:aws:s3:::namiview-prod-bucket/*"
+          "arn:aws:s3:::namiview-prod-bucket/*",
+          "arn:aws:s3:::namiview-dev-bucket",
+          "arn:aws:s3:::namiview-dev-bucket/*"
         ]
       },
       {
@@ -118,10 +121,13 @@ resource "aws_iam_policy" "github_actions_ci" {
         Resource = "*"
       },
       {
-        Sid      = "SecretsManager"
-        Effect   = "Allow"
-        Action   = ["secretsmanager:*"]
-        Resource = "arn:aws:secretsmanager:eu-west-1:${data.aws_caller_identity.current.account_id}:secret:namiview-prod/*"
+        Sid    = "SecretsManager"
+        Effect = "Allow"
+        Action = ["secretsmanager:*"]
+        Resource = [
+          "arn:aws:secretsmanager:eu-west-1:${data.aws_caller_identity.current.account_id}:secret:namiview-prod/*",
+          "arn:aws:secretsmanager:eu-west-1:${data.aws_caller_identity.current.account_id}:secret:namiview-dev/*"
+        ]
       },
       {
         Sid      = "ACM"
