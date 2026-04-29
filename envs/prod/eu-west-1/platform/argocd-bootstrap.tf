@@ -29,6 +29,7 @@ resource "kubernetes_manifest" "argocd_project" {
         { namespace = "arc-runners", server = local.k8s_server },
         { namespace = "keda", server = local.k8s_server },
         { namespace = "tailscale", server = local.k8s_server },
+        { namespace = "namiview-dev", server = local.k8s_server },
       ]
       # Only the cluster-scoped resources our apps actually create
       clusterResourceWhitelist = [
