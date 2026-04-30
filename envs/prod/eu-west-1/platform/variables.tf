@@ -13,3 +13,9 @@ variable "argocd_target_revision" {
   type        = string
   default     = "main"
 }
+
+variable "argocd_dev_target_revision" {
+  description = "Git branch/tag for the dev apps-root to track. Set to a feature branch while iterating, flip back to main once dev workload changes are merged."
+  type        = string
+  default     = "main"
+}
