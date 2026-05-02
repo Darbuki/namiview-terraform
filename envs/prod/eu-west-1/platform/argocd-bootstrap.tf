@@ -139,7 +139,7 @@ resource "kubernetes_manifest" "argocd_infrastructure_root" {
       project = "namiview"
       source = {
         repoURL        = local.gitops_repo
-        targetRevision = var.argocd_target_revision
+        targetRevision = var.argocd_infrastructure_target_revision
         path           = "infrastructure-eks"
       }
       destination = {

@@ -14,6 +14,12 @@ variable "argocd_target_revision" {
   default     = "main"
 }
 
+variable "argocd_infrastructure_target_revision" {
+  description = "Git branch/tag for the EKS infrastructure root app to track"
+  type        = string
+  default     = "main"
+}
+
 variable "argocd_dev_target_revision" {
   description = "Git branch/tag for the dev apps-root to track. Set to a feature branch while iterating, flip back to main once dev workload changes are merged."
   type        = string
