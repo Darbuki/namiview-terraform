@@ -91,6 +91,15 @@ resource "aws_iam_policy" "github_actions_ci" {
         ]
       },
       {
+        Sid    = "S3Loki"
+        Effect = "Allow"
+        Action = ["s3:*"]
+        Resource = [
+          "arn:aws:s3:::namiview-loki-logs",
+          "arn:aws:s3:::namiview-loki-logs/*"
+        ]
+      },
+      {
         Sid    = "S3State"
         Effect = "Allow"
         Action = [

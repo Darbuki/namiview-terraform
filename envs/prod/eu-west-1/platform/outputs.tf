@@ -6,6 +6,14 @@ output "s3_bucket_name" {
   value = aws_s3_bucket.namiview-prod-bucket.bucket
 }
 
+output "loki_bucket_name" {
+  value = aws_s3_bucket.loki.bucket
+}
+
+output "loki_irsa_role_arn" {
+  value = module.loki_irsa.iam_role_arn
+}
+
 output "jobs_queue_url" {
   value = aws_sqs_queue.jobs.url
 }
