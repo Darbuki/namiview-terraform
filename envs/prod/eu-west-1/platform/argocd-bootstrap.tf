@@ -13,6 +13,8 @@ resource "kubernetes_manifest" "argocd_project" {
         local.charts_repo,
         "https://charts.external-secrets.io",
         "https://prometheus-community.github.io/helm-charts",
+        "https://grafana-community.github.io/helm-charts",
+        "https://grafana.github.io/helm-charts",
         "ghcr.io/actions/actions-runner-controller-charts",
         "https://kedacore.github.io/charts",
         "https://pkgs.tailscale.com/helmcharts"
@@ -30,6 +32,7 @@ resource "kubernetes_manifest" "argocd_project" {
         { namespace = "keda", server = local.k8s_server },
         { namespace = "tailscale", server = local.k8s_server },
         { namespace = "namiview-dev", server = local.k8s_server },
+        { namespace = "logging", server = local.k8s_server },
       ]
       # Only the cluster-scoped resources our apps actually create
       clusterResourceWhitelist = [
