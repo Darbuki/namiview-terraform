@@ -93,11 +93,32 @@ resource "aws_iam_policy" "github_actions_ci" {
       {
         Sid    = "S3Loki"
         Effect = "Allow"
-        Action = ["s3:*"]
-        Resource = [
-          "arn:aws:s3:::namiview-loki-logs",
-          "arn:aws:s3:::namiview-loki-logs/*"
+        Action = [
+          "s3:CreateBucket",
+          "s3:GetBucketLocation",
+          "s3:ListBucket",
+          "s3:GetBucketPublicAccessBlock",
+          "s3:PutBucketPublicAccessBlock",
+          "s3:GetEncryptionConfiguration",
+          "s3:PutEncryptionConfiguration",
+          "s3:GetLifecycleConfiguration",
+          "s3:PutLifecycleConfiguration",
+          "s3:GetBucketTagging",
+          "s3:PutBucketTagging",
         ]
+        Resource = "arn:aws:s3:::namiview-loki-logs"
+      },
+      {
+        Sid    = "S3LokiObjects"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload",
+          "s3:ListMultipartUploadParts",
+        ]
+        Resource = "arn:aws:s3:::namiview-loki-logs/*"
       },
       {
         Sid    = "S3State"
