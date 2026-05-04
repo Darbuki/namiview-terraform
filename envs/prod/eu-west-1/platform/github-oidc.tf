@@ -102,6 +102,8 @@ resource "aws_iam_policy" "github_actions_ci" {
           "s3:DeleteBucketPolicy",
           "s3:GetBucketPublicAccessBlock",
           "s3:PutBucketPublicAccessBlock",
+          "s3:GetBucketAcl",
+          "s3:PutBucketAcl",
           "s3:GetEncryptionConfiguration",
           "s3:PutEncryptionConfiguration",
           "s3:GetLifecycleConfiguration",
