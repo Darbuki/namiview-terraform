@@ -111,6 +111,7 @@ resource "aws_iam_policy" "github_actions_ci" {
           "s3:PutBucketWebsite",
           "s3:DeleteBucketWebsite",
           "s3:GetBucketVersioning",
+          "s3:GetBucketRequestPayment",
           "s3:PutBucketVersioning",
           "s3:GetBucketLogging",
           "s3:PutBucketLogging",
