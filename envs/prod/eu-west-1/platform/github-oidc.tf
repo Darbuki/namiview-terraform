@@ -107,6 +107,7 @@ resource "aws_iam_policy" "github_actions_ci" {
           "s3:PutBucketAcl",
           "s3:GetBucketCORS",
           "s3:PutBucketCORS",
+          "s3:GetBucketWebsite",
           "s3:PutBucketWebsite",
           "s3:DeleteBucketWebsite",
           "s3:GetBucketVersioning",
