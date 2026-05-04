@@ -110,6 +110,7 @@ resource "aws_iam_policy" "github_actions_ci" {
           "s3:GetAccelerateConfiguration",
           "s3:PutAccelerateConfiguration",
           "s3:GetBucketVersioning",
+          "s3:GetBucketRequestPayment",
           "s3:PutBucketVersioning",
           "s3:DeleteBucketCORS",
           "s3:GetEncryptionConfiguration",
