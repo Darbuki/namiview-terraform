@@ -30,5 +30,8 @@ output "tailscale_operator_oauth_secret_name" {
 
 output "ecr_repository_urls" {
   description = "Map of ECR repository name → URL. Consumed by CI workflows and Helm values."
-  value       = { for k, v in aws_ecr_repository.app : k => v.repository_url }
+  value       = merge(
+    { for k, v in aws_ecr_repository.app : k => v.repository_url },
+    { for k, v in aws_ecr_repository.mutable : k => v.repository_url }
+  )
 }

@@ -282,7 +282,11 @@ data "aws_iam_policy_document" "namiview_app_ci_trust" {
       variable = "token.actions.githubusercontent.com:sub"
       values = [
         "repo:Darbuki/namiview:ref:refs/heads/*",
-        "repo:Darbuki/namiview:environment:hydro-vision"
+        "repo:Darbuki/namiview:environment:hydro-vision",
+        "repo:Darbuki/namiview-base:ref:refs/heads/*",
+        "repo:Darbuki/namiview-base:environment:namiview",
+        "repo:Darbuki/namiview-agents:ref:refs/heads/*",
+        "repo:Darbuki/namiview-agents:environment:namiview"
       ]
     }
   }
