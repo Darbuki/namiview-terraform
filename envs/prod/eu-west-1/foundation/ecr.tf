@@ -6,8 +6,8 @@
 ########################################################################
 
 locals {
-  ecr_repos           = ["namiview-api", "namiview-ui", "namiview-worker"]
-  ecr_repos_mutable   = ["namiview-base", "namiview-triage"]
+  ecr_repos         = ["namiview-api", "namiview-ui", "namiview-worker"]
+  ecr_repos_mutable = ["namiview-base", "namiview-triage"]
 }
 
 resource "aws_ecr_repository" "app" {
