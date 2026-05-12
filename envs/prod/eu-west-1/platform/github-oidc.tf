@@ -31,8 +31,6 @@ data "aws_iam_policy_document" "github_actions_trust" {
       variable = "token.actions.githubusercontent.com:sub"
       values = [
         "repo:Darbuki/namiview-terraform:ref:refs/heads/main",
-        "repo:Darbuki/namiview-terraform:ref:refs/heads/86-async-job-queue-sqs-worker-5-variant-previewsave-flow",
-        "repo:Darbuki/namiview-terraform:ref:refs/heads/88-bootstrap-dev-environment-in-eks-cluster-shape-2",
         "repo:Darbuki/namiview-terraform:pull_request",
         "repo:Darbuki/namiview-terraform:environment:production"
       ]
@@ -239,7 +237,18 @@ resource "aws_iam_policy" "github_actions_ci" {
         Effect   = "Allow"
         Action   = ["sqs:*"]
         Resource = "arn:aws:sqs:eu-west-1:${data.aws_caller_identity.current.account_id}:namiview-*"
-        # Karpenter interruption queue (upcoming)
+      },
+      {
+        Sid      = "ECR"
+        Effect   = "Allow"
+        Action   = ["ecr:*"]
+        Resource = "arn:aws:ecr:eu-west-1:${data.aws_caller_identity.current.account_id}:repository/namiview-*"
+      },
+      {
+        Sid      = "ECRAuth"
+        Effect   = "Allow"
+        Action   = ["ecr:GetAuthorizationToken"]
+        Resource = "*"
       }
     ]
   })
@@ -248,4 +257,69 @@ resource "aws_iam_policy" "github_actions_ci" {
 resource "aws_iam_role_policy_attachment" "github_actions_ci" {
   role       = aws_iam_role.github_actions.name
   policy_arn = aws_iam_policy.github_actions_ci.arn
+}
+
+# --- GitHub OIDC for namiview app repo → ECR push ---
+
+data "aws_iam_policy_document" "namiview_app_ci_trust" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.github.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:sub"
+      values = [
+        "repo:Darbuki/namiview:ref:refs/heads/*",
+        "repo:Darbuki/namiview:environment:hydro-vision"
+      ]
+    }
+  }
+}
+
+resource "aws_iam_role" "namiview_app_ci" {
+  name               = "namiview-app-ci"
+  assume_role_policy = data.aws_iam_policy_document.namiview_app_ci_trust.json
+}
+
+resource "aws_iam_role_policy" "namiview_app_ecr" {
+  name = "ecr-push"
+  role = aws_iam_role.namiview_app_ci.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "ECRAuth"
+        Effect = "Allow"
+        Action = ["ecr:GetAuthorizationToken"]
+        Resource = "*"
+      },
+      {
+        Sid    = "ECRPush"
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload"
+        ]
+        Resource = "arn:aws:ecr:${var.region}:${data.aws_caller_identity.current.account_id}:repository/namiview-*"
+      }
+    ]
+  })
 }

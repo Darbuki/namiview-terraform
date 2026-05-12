@@ -27,3 +27,8 @@ output "tailscale_operator_oauth_secret_name" {
   description = "Name of the Tailscale operator OAuth client secret."
   value       = aws_secretsmanager_secret.tailscale_operator_oauth.name
 }
+
+output "ecr_repository_urls" {
+  description = "Map of ECR repository name → URL. Consumed by CI workflows and Helm values."
+  value       = { for k, v in aws_ecr_repository.app : k => v.repository_url }
+}
