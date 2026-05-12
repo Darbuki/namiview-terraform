@@ -84,8 +84,71 @@ resource "aws_iam_policy" "github_actions_ci" {
         Action = ["s3:*"]
         Resource = [
           "arn:aws:s3:::namiview-prod-bucket",
-          "arn:aws:s3:::namiview-prod-bucket/*"
+          "arn:aws:s3:::namiview-prod-bucket/*",
+          "arn:aws:s3:::namiview-dev-bucket",
+          "arn:aws:s3:::namiview-dev-bucket/*"
         ]
+      },
+      {
+        Sid    = "S3Loki"
+        Effect = "Allow"
+        Action = [
+          "s3:CreateBucket",
+          "s3:DeleteBucket",
+          "s3:ListBucket",
+          "s3:ListBucketMultipartUploads",
+          "s3:GetBucketLocation",
+          "s3:GetBucketPolicy",
+          "s3:PutBucketPolicy",
+          "s3:DeleteBucketPolicy",
+          "s3:GetBucketPolicyStatus",
+          "s3:GetBucketAcl",
+          "s3:PutBucketAcl",
+          "s3:GetBucketCORS",
+          "s3:PutBucketCORS",
+          "s3:GetBucketWebsite",
+          "s3:PutBucketWebsite",
+          "s3:DeleteBucketWebsite",
+          "s3:GetBucketVersioning",
+          "s3:GetBucketRequestPayment",
+          "s3:PutBucketVersioning",
+          "s3:GetBucketLogging",
+          "s3:PutBucketLogging",
+          "s3:GetBucketWebsite",
+          "s3:GetBucketRequestPayment",
+          "s3:PutBucketRequestPayment",
+          "s3:GetAccelerateConfiguration",
+          "s3:PutAccelerateConfiguration",
+          "s3:GetEncryptionConfiguration",
+          "s3:PutEncryptionConfiguration",
+          "s3:GetLifecycleConfiguration",
+          "s3:PutLifecycleConfiguration",
+          "s3:GetReplicationConfiguration",
+          "s3:PutReplicationConfiguration",
+          "s3:GetBucketObjectLockConfiguration",
+          "s3:PutBucketObjectLockConfiguration",
+          "s3:GetBucketOwnershipControls",
+          "s3:PutBucketOwnershipControls",
+          "s3:GetBucketPublicAccessBlock",
+          "s3:PutBucketPublicAccessBlock",
+          "s3:GetBucketNotification",
+          "s3:PutBucketNotification",
+          "s3:GetBucketTagging",
+          "s3:PutBucketTagging"
+        ]
+        Resource = "arn:aws:s3:::namiview-loki-logs"
+      },
+      {
+        Sid    = "S3LokiObjects"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload",
+          "s3:ListMultipartUploadParts",
+        ]
+        Resource = "arn:aws:s3:::namiview-loki-logs/*"
       },
       {
         Sid    = "S3State"
@@ -118,10 +181,13 @@ resource "aws_iam_policy" "github_actions_ci" {
         Resource = "*"
       },
       {
-        Sid      = "SecretsManager"
-        Effect   = "Allow"
-        Action   = ["secretsmanager:*"]
-        Resource = "arn:aws:secretsmanager:eu-west-1:${data.aws_caller_identity.current.account_id}:secret:namiview-prod/*"
+        Sid    = "SecretsManager"
+        Effect = "Allow"
+        Action = ["secretsmanager:*"]
+        Resource = [
+          "arn:aws:secretsmanager:eu-west-1:${data.aws_caller_identity.current.account_id}:secret:namiview-prod/*",
+          "arn:aws:secretsmanager:eu-west-1:${data.aws_caller_identity.current.account_id}:secret:namiview-dev/*"
+        ]
       },
       {
         Sid      = "ACM"
