@@ -31,7 +31,6 @@ data "aws_iam_policy_document" "github_actions_trust" {
       variable = "token.actions.githubusercontent.com:sub"
       values = [
         "repo:Darbuki/namiview-terraform:ref:refs/heads/main",
-        "repo:Darbuki/namiview-terraform:ref:refs/heads/99-migrate-from-dockerhub-to-ecr",
         "repo:Darbuki/namiview-terraform:pull_request",
         "repo:Darbuki/namiview-terraform:environment:production"
       ]
