@@ -1,28 +1,5 @@
-resource "aws_sqs_queue" "jobs_dlq" {
-  name                      = "${var.cluster_name}-jobs-dlq"
-  message_retention_seconds = 1209600 # 14d
-}
-
-resource "aws_sqs_queue" "jobs" {
-  name                       = "${var.cluster_name}-jobs"
-  visibility_timeout_seconds = 300
-  message_retention_seconds  = 345600 # 4d
-
-  redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.jobs_dlq.arn
-    maxReceiveCount     = 3
-  })
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "namiview" {
-  bucket = aws_s3_bucket.namiview-prod-bucket.id
-
-  rule {
-    id     = "expire-pending"
-    status = "Enabled"
-    filter { prefix = "pending/" }
-    expiration { days = 1 }
-  }
+data "aws_sqs_queue" "jobs" {
+  name = "${var.cluster_name}-jobs"
 }
 
 resource "aws_iam_role_policy" "api_jobs_access" {
@@ -38,7 +15,7 @@ resource "aws_iam_role_policy" "api_jobs_access" {
         "sqs:GetQueueUrl",
         "sqs:GetQueueAttributes",
       ]
-      Resource = aws_sqs_queue.jobs.arn
+      Resource = data.aws_sqs_queue.jobs.arn
     }]
   })
 }
@@ -72,7 +49,7 @@ resource "aws_iam_role_policy" "worker_sqs_access" {
         "sqs:GetQueueUrl",
         "sqs:GetQueueAttributes",
       ]
-      Resource = aws_sqs_queue.jobs.arn
+      Resource = data.aws_sqs_queue.jobs.arn
     }]
   })
 }
@@ -89,7 +66,7 @@ resource "aws_iam_role_policy" "worker_s3_access" {
         "s3:GetObject",
         "s3:PutObject",
       ]
-      Resource = "${aws_s3_bucket.namiview-prod-bucket.arn}/pending/*"
+      Resource = "${data.aws_s3_bucket.namiview_prod_bucket.arn}/pending/*"
     }]
   })
 }

@@ -25,3 +25,14 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "namiview_dev" {
     bucket_key_enabled = true
   }
 }
+
+resource "aws_s3_bucket_lifecycle_configuration" "namiview_dev" {
+  bucket = aws_s3_bucket.namiview-dev-bucket.id
+
+  rule {
+    id     = "expire-pending"
+    status = "Enabled"
+    filter { prefix = "pending/" }
+    expiration { days = 1 }
+  }
+}

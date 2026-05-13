@@ -28,6 +28,16 @@ output "tailscale_operator_oauth_secret_name" {
   value       = aws_secretsmanager_secret.tailscale_operator_oauth.name
 }
 
+output "s3_bucket_prod_arn" {
+  description = "ARN of the prod S3 bucket."
+  value       = aws_s3_bucket.namiview-prod-bucket.arn
+}
+
+output "sqs_jobs_arn" {
+  description = "ARN of the prod jobs SQS queue."
+  value       = aws_sqs_queue.jobs.arn
+}
+
 output "ecr_repository_urls" {
   description = "Map of ECR repository name → URL. Consumed by CI workflows and Helm values."
   value = merge(
