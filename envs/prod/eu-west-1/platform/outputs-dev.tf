@@ -1,9 +1,9 @@
 output "jobs_dev_queue_url" {
-  value = aws_sqs_queue.jobs_dev.url
+  value = data.aws_sqs_queue.jobs_dev.url
 }
 
 output "jobs_dev_queue_arn" {
-  value = aws_sqs_queue.jobs_dev.arn
+  value = data.aws_sqs_queue.jobs_dev.arn
 }
 
 output "api_dev_irsa_role_arn" {

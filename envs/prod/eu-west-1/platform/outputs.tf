@@ -3,7 +3,7 @@ output "github_actions_role_arn" {
 }
 
 output "s3_bucket_name" {
-  value = aws_s3_bucket.namiview-prod-bucket.bucket
+  value = data.aws_s3_bucket.namiview_prod_bucket.bucket
 }
 
 output "loki_bucket_name" {
@@ -15,11 +15,11 @@ output "loki_irsa_role_arn" {
 }
 
 output "jobs_queue_url" {
-  value = aws_sqs_queue.jobs.url
+  value = data.aws_sqs_queue.jobs.url
 }
 
 output "jobs_queue_arn" {
-  value = aws_sqs_queue.jobs.arn
+  value = data.aws_sqs_queue.jobs.arn
 }
 
 output "worker_irsa_role_arn" {
