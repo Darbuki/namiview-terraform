@@ -32,7 +32,7 @@ resource "aws_secretsmanager_secret" "triage_agent_github_pat" {
 
 resource "aws_secretsmanager_secret" "cloudflare_tunnel_token" {
   name        = "${var.cluster_name}/cloudflare-tunnel-token"
-  description = "Cloudflare Tunnel connector token for the homelab cluster's cloudflared deployment. Get from Cloudflare dashboard → Zero Trust → Networks → Tunnels → namiview-tunnel → Configure. Populated by hand."
+  description = "Cloudflare Tunnel connector token used by the cloudflared deployment on the homelab cluster to register with Cloudflare's edge."
 
   lifecycle {
     prevent_destroy = true
