@@ -39,6 +39,15 @@ resource "aws_secretsmanager_secret" "argocd_admin_password" {
   }
 }
 
+resource "aws_secretsmanager_secret" "atlas_api_credentials" {
+  name        = "${var.cluster_name}/atlas-api-credentials"
+  description = "MongoDB Atlas programmatic API key used by the in-cluster IP allowlist sync CronJob to keep the homelab's dynamic egress IP allowlisted. Stored as JSON with keys public_key, private_key, project_id."
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 resource "aws_secretsmanager_secret" "cloudflare_tunnel_token" {
   name        = "${var.cluster_name}/cloudflare-tunnel-token"
   description = "Cloudflare Tunnel connector token used by the cloudflared deployment on the homelab cluster to register with Cloudflare's edge."
