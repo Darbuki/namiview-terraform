@@ -30,6 +30,15 @@ resource "aws_secretsmanager_secret" "triage_agent_github_pat" {
   }
 }
 
+resource "aws_secretsmanager_secret" "argocd_admin_password" {
+  name        = "${var.cluster_name}/argocd-admin-password"
+  description = "ArgoCD admin password for the homelab cluster."
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 resource "aws_secretsmanager_secret" "cloudflare_tunnel_token" {
   name        = "${var.cluster_name}/cloudflare-tunnel-token"
   description = "Cloudflare Tunnel connector token used by the cloudflared deployment on the homelab cluster to register with Cloudflare's edge."

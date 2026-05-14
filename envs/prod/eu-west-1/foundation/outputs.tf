@@ -18,6 +18,16 @@ output "triage_agent_github_pat_secret_name" {
   value       = aws_secretsmanager_secret.triage_agent_github_pat.name
 }
 
+output "argocd_admin_password_secret_arn" {
+  description = "ARN of the ArgoCD admin password secret."
+  value       = aws_secretsmanager_secret.argocd_admin_password.arn
+}
+
+output "argocd_admin_password_secret_name" {
+  description = "Name of the ArgoCD admin password secret."
+  value       = aws_secretsmanager_secret.argocd_admin_password.name
+}
+
 output "cloudflare_tunnel_token_secret_arn" {
   description = "ARN of the Cloudflare Tunnel token secret. Consumed by ExternalSecrets in-cluster (cloudflare namespace)."
   value       = aws_secretsmanager_secret.cloudflare_tunnel_token.arn
