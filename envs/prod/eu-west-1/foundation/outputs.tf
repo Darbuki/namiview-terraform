@@ -18,6 +18,16 @@ output "triage_agent_github_pat_secret_name" {
   value       = aws_secretsmanager_secret.triage_agent_github_pat.name
 }
 
+output "cloudflare_tunnel_token_secret_arn" {
+  description = "ARN of the Cloudflare Tunnel token secret. Consumed by ExternalSecrets in-cluster (cloudflare namespace)."
+  value       = aws_secretsmanager_secret.cloudflare_tunnel_token.arn
+}
+
+output "cloudflare_tunnel_token_secret_name" {
+  description = "Name of the Cloudflare Tunnel token secret."
+  value       = aws_secretsmanager_secret.cloudflare_tunnel_token.name
+}
+
 output "tailscale_operator_oauth_secret_arn" {
   description = "ARN of the Tailscale operator OAuth client secret. Consumed by ExternalSecrets in-cluster (looked up by name pattern, not remote_state)."
   value       = aws_secretsmanager_secret.tailscale_operator_oauth.arn

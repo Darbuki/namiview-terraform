@@ -30,6 +30,15 @@ resource "aws_secretsmanager_secret" "triage_agent_github_pat" {
   }
 }
 
+resource "aws_secretsmanager_secret" "cloudflare_tunnel_token" {
+  name        = "${var.cluster_name}/cloudflare-tunnel-token"
+  description = "Cloudflare Tunnel connector token for the homelab cluster's cloudflared deployment. Get from Cloudflare dashboard → Zero Trust → Networks → Tunnels → namiview-tunnel → Configure. Populated by hand."
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 resource "aws_secretsmanager_secret" "tailscale_operator_oauth" {
   name        = "${var.cluster_name}/tailscale-operator-oauth"
   description = "Tailscale OAuth client credentials for the in-cluster Tailscale operator. Stored as JSON: {\"client_id\": \"...\", \"client_secret\": \"...\"}. Mint at https://login.tailscale.com/admin/settings/oauth with scopes `devices:core` + `auth_keys` and tag `tag:k8s`. Synced into the cluster by ESO as a Secret named `operator-oauth` in the `tailscale` namespace."
