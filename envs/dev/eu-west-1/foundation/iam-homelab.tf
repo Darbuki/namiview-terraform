@@ -9,6 +9,19 @@ resource "aws_iam_access_key" "homelab_dev" {
   user = aws_iam_user.homelab_dev.name
 }
 
+resource "aws_secretsmanager_secret" "homelab_dev_credentials" {
+  name        = "namiview-prod/homelab-dev-credentials"
+  description = "AWS access key + secret for the namiview-homelab-dev IAM user. Bootstrap source for the k8s aws-credentials secret in the namiview-dev namespace."
+}
+
+resource "aws_secretsmanager_secret_version" "homelab_dev_credentials" {
+  secret_id = aws_secretsmanager_secret.homelab_dev_credentials.id
+  secret_string = jsonencode({
+    access_key_id     = aws_iam_access_key.homelab_dev.id
+    secret_access_key = aws_iam_access_key.homelab_dev.secret
+  })
+}
+
 resource "aws_iam_user_policy" "homelab_dev" {
   name = "namiview-homelab-dev"
   user = aws_iam_user.homelab_dev.name

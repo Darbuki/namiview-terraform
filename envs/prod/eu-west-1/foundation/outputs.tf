@@ -38,16 +38,14 @@ output "sqs_jobs_arn" {
   value       = aws_sqs_queue.jobs.arn
 }
 
-output "homelab_prod_access_key_id" {
-  description = "Access key ID for the homelab prod IAM user — bootstrap into k8s secret aws-credentials in namiview namespace."
-  value       = aws_iam_access_key.homelab_prod.id
-  sensitive   = true
+output "homelab_prod_credentials_secret_name" {
+  description = "Secrets Manager name holding the homelab prod IAM access key. Retrieve with: aws secretsmanager get-secret-value --secret-id <name>"
+  value       = aws_secretsmanager_secret.homelab_prod_credentials.name
 }
 
-output "homelab_prod_secret_access_key" {
-  description = "Secret access key for the homelab prod IAM user."
-  value       = aws_iam_access_key.homelab_prod.secret
-  sensitive   = true
+output "homelab_prod_credentials_secret_arn" {
+  description = "ARN of the homelab prod credentials secret."
+  value       = aws_secretsmanager_secret.homelab_prod_credentials.arn
 }
 
 output "ecr_repository_urls" {

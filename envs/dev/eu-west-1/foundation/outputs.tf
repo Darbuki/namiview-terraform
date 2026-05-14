@@ -13,14 +13,12 @@ output "sqs_jobs_arn" {
   value       = aws_sqs_queue.jobs.arn
 }
 
-output "homelab_dev_access_key_id" {
-  description = "Access key ID for the homelab dev IAM user — bootstrap into k8s secret aws-credentials in namiview-dev namespace."
-  value       = aws_iam_access_key.homelab_dev.id
-  sensitive   = true
+output "homelab_dev_credentials_secret_name" {
+  description = "Secrets Manager name holding the homelab dev IAM access key. Retrieve with: aws secretsmanager get-secret-value --secret-id <name>"
+  value       = aws_secretsmanager_secret.homelab_dev_credentials.name
 }
 
-output "homelab_dev_secret_access_key" {
-  description = "Secret access key for the homelab dev IAM user."
-  value       = aws_iam_access_key.homelab_dev.secret
-  sensitive   = true
+output "homelab_dev_credentials_secret_arn" {
+  description = "ARN of the homelab dev credentials secret."
+  value       = aws_secretsmanager_secret.homelab_dev_credentials.arn
 }
