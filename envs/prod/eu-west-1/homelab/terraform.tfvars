@@ -1,2 +1,6 @@
-region          = "eu-west-1"
-kubeconfig_path = "~/.kube/config"
+region                                = "eu-west-1"
+kubeconfig_path                       = "/Users/dar/.kube/config"
+kubeconfig_context                    = "homelab"
+argocd_target_revision                = "main"
+argocd_dev_target_revision            = "main"
+argocd_infrastructure_target_revision = "main"

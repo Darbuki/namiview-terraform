@@ -1,0 +1,19 @@
+# Single-node k3s — drop HA / multi-replica defaults.
+redis-ha:
+  enabled: false
+
+controller:
+  replicas: 1
+
+server:
+  autoscaling:
+    enabled: false
+  replicas: 1
+
+repoServer:
+  autoscaling:
+    enabled: false
+  replicas: 1
+
+applicationSet:
+  replicas: 1
