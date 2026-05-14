@@ -2,18 +2,46 @@
 redis-ha:
   enabled: false
 
+configs:
+  params:
+    # Terminate TLS at Cloudflare's edge; in-cluster cloudflared → argocd-server
+    # talks plain HTTP. The kube network is private, no exposure risk.
+    server.insecure: true
+
 controller:
   replicas: 1
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
 
 server:
   autoscaling:
     enabled: false
   replicas: 1
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
 
 repoServer:
   autoscaling:
     enabled: false
   replicas: 1
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
 
 applicationSet:
   replicas: 1
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+notifications:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
