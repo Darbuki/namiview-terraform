@@ -10,6 +10,10 @@ resource "kubernetes_namespace" "namiview_dev" {
   metadata { name = "namiview-dev" }
 }
 
+resource "kubernetes_namespace" "namiview_agents" {
+  metadata { name = "namiview-agents" }
+}
+
 resource "kubernetes_namespace" "argocd" {
   metadata { name = local.argocd_namespace }
 }
@@ -45,6 +49,20 @@ resource "kubernetes_secret" "aws_credentials_prod" {
   metadata {
     name      = "aws-credentials"
     namespace = kubernetes_namespace.namiview.metadata[0].name
+  }
+  data = {
+    "access-key-id"     = local.homelab_prod_creds.access_key_id
+    "secret-access-key" = local.homelab_prod_creds.secret_access_key
+  }
+  type = "Opaque"
+}
+
+# Used by the ecr-refresh CronJob in namiview-agents to call AWS ECR.
+# Triage itself doesn't talk to AWS APIs directly — its secrets come via ESO.
+resource "kubernetes_secret" "aws_credentials_agents" {
+  metadata {
+    name      = "aws-credentials"
+    namespace = kubernetes_namespace.namiview_agents.metadata[0].name
   }
   data = {
     "access-key-id"     = local.homelab_prod_creds.access_key_id
