@@ -83,8 +83,35 @@ resource "aws_iam_user_policy" "homelab_prod" {
           "ecr:BatchGetImage",
           "ecr:DescribeRepositories",
           "ecr:ListImages",
+          "ecr:DescribeImages",
         ]
         Resource = "arn:aws:ecr:${var.region}:${data.aws_caller_identity.current.account_id}:repository/*"
+      },
+      # Read-only CloudWatch + resource-tag access for the yace exporter
+      # (in-cluster pod that scrapes SQS/S3/ECR CloudWatch metrics).
+      {
+        Sid    = "CloudWatchReadForYACE"
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:GetMetricData",
+          "cloudwatch:GetMetricStatistics",
+          "cloudwatch:ListMetrics",
+          "tag:GetResources",
+        ]
+        Resource = "*"
+      },
+      # yace's discovery needs to list buckets/queues account-wide.
+      {
+        Sid    = "ListResourcesForYACE"
+        Effect = "Allow"
+        Action = [
+          "s3:ListAllMyBuckets",
+          "s3:GetBucketLocation",
+          "s3:GetBucketTagging",
+          "sqs:ListQueues",
+          "sqs:ListQueueTags",
+        ]
+        Resource = "*"
       },
     ]
   })
