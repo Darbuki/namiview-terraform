@@ -7,7 +7,7 @@ output "s3_bucket_name" {
 }
 
 output "loki_bucket_name" {
-  value = aws_s3_bucket.loki.bucket
+  value = data.aws_s3_bucket.loki.bucket
 }
 
 output "loki_irsa_role_arn" {
