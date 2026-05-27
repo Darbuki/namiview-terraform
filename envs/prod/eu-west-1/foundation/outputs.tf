@@ -53,6 +53,16 @@ output "s3_bucket_prod_arn" {
   value       = aws_s3_bucket.namiview-prod-bucket.arn
 }
 
+output "s3_bucket_loki_arn" {
+  description = "ARN of the Loki chunk/index bucket."
+  value       = aws_s3_bucket.loki.arn
+}
+
+output "s3_bucket_loki_name" {
+  description = "Name of the Loki chunk/index bucket."
+  value       = aws_s3_bucket.loki.bucket
+}
+
 output "sqs_jobs_arn" {
   description = "ARN of the prod jobs SQS queue."
   value       = aws_sqs_queue.jobs.arn

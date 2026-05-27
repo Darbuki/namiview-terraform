@@ -1,40 +1,7 @@
-resource "aws_s3_bucket" "loki" {
+# Loki bucket itself lives in the foundation layer (envs/prod/eu-west-1/foundation/buckets-loki.tf)
+# so it survives the EKS teardown. Read it by name to avoid a cross-layer state dependency.
+data "aws_s3_bucket" "loki" {
   bucket = "namiview-loki-logs"
-}
-
-resource "aws_s3_bucket_public_access_block" "loki" {
-  bucket = aws_s3_bucket.loki.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "loki" {
-  bucket = aws_s3_bucket.loki.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-    bucket_key_enabled = true
-  }
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "loki" {
-  bucket = aws_s3_bucket.loki.id
-
-  rule {
-    id     = "expire-loki-objects"
-    status = "Enabled"
-
-    filter {}
-
-    expiration {
-      days = 2
-    }
-  }
 }
 
 module "loki_irsa" {
@@ -65,7 +32,7 @@ resource "aws_iam_role_policy" "loki_s3_access" {
           "s3:ListBucket",
           "s3:ListBucketMultipartUploads",
         ]
-        Resource = aws_s3_bucket.loki.arn
+        Resource = data.aws_s3_bucket.loki.arn
       },
       {
         Effect = "Allow"
@@ -76,7 +43,7 @@ resource "aws_iam_role_policy" "loki_s3_access" {
           "s3:ListMultipartUploadParts",
           "s3:PutObject",
         ]
-        Resource = "${aws_s3_bucket.loki.arn}/*"
+        Resource = "${data.aws_s3_bucket.loki.arn}/*"
       }
     ]
   })
