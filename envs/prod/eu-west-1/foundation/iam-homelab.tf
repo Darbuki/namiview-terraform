@@ -42,6 +42,27 @@ resource "aws_iam_user_policy" "homelab_prod" {
           "${aws_s3_bucket.namiview-prod-bucket.arn}/*",
         ]
       },
+      # Loki on the homelab cluster writes chunks/index to the
+      # `namiview-loki-logs` bucket (declared in the platform layer).
+      # Bucket is referenced by name to avoid a cross-layer state read.
+      {
+        Sid    = "S3ReadWriteLokiBucket"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket",
+          "s3:GetBucketLocation",
+          "s3:ListBucketMultipartUploads",
+          "s3:AbortMultipartUpload",
+          "s3:ListMultipartUploadParts",
+        ]
+        Resource = [
+          "arn:aws:s3:::namiview-loki-logs",
+          "arn:aws:s3:::namiview-loki-logs/*",
+        ]
+      },
       {
         Sid    = "SQSProdJobs"
         Effect = "Allow"
