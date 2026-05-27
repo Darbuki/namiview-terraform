@@ -18,6 +18,26 @@ output "triage_agent_github_pat_secret_name" {
   value       = aws_secretsmanager_secret.triage_agent_github_pat.name
 }
 
+output "argocd_admin_password_secret_arn" {
+  description = "ARN of the ArgoCD admin password secret."
+  value       = aws_secretsmanager_secret.argocd_admin_password.arn
+}
+
+output "argocd_admin_password_secret_name" {
+  description = "Name of the ArgoCD admin password secret."
+  value       = aws_secretsmanager_secret.argocd_admin_password.name
+}
+
+output "cloudflare_tunnel_token_secret_arn" {
+  description = "ARN of the Cloudflare Tunnel token secret. Consumed by ExternalSecrets in-cluster (cloudflare namespace)."
+  value       = aws_secretsmanager_secret.cloudflare_tunnel_token.arn
+}
+
+output "cloudflare_tunnel_token_secret_name" {
+  description = "Name of the Cloudflare Tunnel token secret."
+  value       = aws_secretsmanager_secret.cloudflare_tunnel_token.name
+}
+
 output "tailscale_operator_oauth_secret_arn" {
   description = "ARN of the Tailscale operator OAuth client secret. Consumed by ExternalSecrets in-cluster (looked up by name pattern, not remote_state)."
   value       = aws_secretsmanager_secret.tailscale_operator_oauth.arn
@@ -26,6 +46,26 @@ output "tailscale_operator_oauth_secret_arn" {
 output "tailscale_operator_oauth_secret_name" {
   description = "Name of the Tailscale operator OAuth client secret."
   value       = aws_secretsmanager_secret.tailscale_operator_oauth.name
+}
+
+output "s3_bucket_prod_arn" {
+  description = "ARN of the prod S3 bucket."
+  value       = aws_s3_bucket.namiview-prod-bucket.arn
+}
+
+output "sqs_jobs_arn" {
+  description = "ARN of the prod jobs SQS queue."
+  value       = aws_sqs_queue.jobs.arn
+}
+
+output "homelab_prod_credentials_secret_name" {
+  description = "Secrets Manager name holding the homelab prod IAM access key. Retrieve with: aws secretsmanager get-secret-value --secret-id <name>"
+  value       = aws_secretsmanager_secret.homelab_prod_credentials.name
+}
+
+output "homelab_prod_credentials_secret_arn" {
+  description = "ARN of the homelab prod credentials secret."
+  value       = aws_secretsmanager_secret.homelab_prod_credentials.arn
 }
 
 output "ecr_repository_urls" {

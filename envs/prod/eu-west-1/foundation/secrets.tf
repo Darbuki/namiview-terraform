@@ -30,6 +30,33 @@ resource "aws_secretsmanager_secret" "triage_agent_github_pat" {
   }
 }
 
+resource "aws_secretsmanager_secret" "argocd_admin_password" {
+  name        = "${var.cluster_name}/argocd-admin-password"
+  description = "ArgoCD admin password for the homelab cluster."
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "aws_secretsmanager_secret" "atlas_api_credentials" {
+  name        = "${var.cluster_name}/atlas-api-credentials"
+  description = "MongoDB Atlas programmatic API key used by the in-cluster IP allowlist sync CronJob to keep the homelab's dynamic egress IP allowlisted. Stored as JSON with keys public_key, private_key, project_id."
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "aws_secretsmanager_secret" "cloudflare_tunnel_token" {
+  name        = "${var.cluster_name}/cloudflare-tunnel-token"
+  description = "Cloudflare Tunnel connector token used by the cloudflared deployment on the homelab cluster to register with Cloudflare's edge."
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 resource "aws_secretsmanager_secret" "tailscale_operator_oauth" {
   name        = "${var.cluster_name}/tailscale-operator-oauth"
   description = "Tailscale OAuth client credentials for the in-cluster Tailscale operator. Stored as JSON: {\"client_id\": \"...\", \"client_secret\": \"...\"}. Mint at https://login.tailscale.com/admin/settings/oauth with scopes `devices:core` + `auth_keys` and tag `tag:k8s`. Synced into the cluster by ESO as a Secret named `operator-oauth` in the `tailscale` namespace."

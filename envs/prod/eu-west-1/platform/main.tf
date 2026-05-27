@@ -1,29 +1,7 @@
 data "aws_caller_identity" "current" {}
 
-resource "aws_s3_bucket" "namiview-prod-bucket" {
+data "aws_s3_bucket" "namiview_prod_bucket" {
   bucket = "namiview-prod-bucket"
-}
-
-# Block all public access — belt-and-suspenders guard
-resource "aws_s3_bucket_public_access_block" "namiview" {
-  bucket = aws_s3_bucket.namiview-prod-bucket.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-# Encrypt at rest with SSE-S3 (free, no KMS key required)
-resource "aws_s3_bucket_server_side_encryption_configuration" "namiview" {
-  bucket = aws_s3_bucket.namiview-prod-bucket.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-    bucket_key_enabled = true
-  }
 }
 
 # S3 Gateway VPC Endpoint — free, keeps S3 traffic off the internet
@@ -66,8 +44,8 @@ resource "aws_iam_role_policy" "api_s3_access" {
           "s3:HeadBucket"
         ]
         Resource = [
-          aws_s3_bucket.namiview-prod-bucket.arn,
-          "${aws_s3_bucket.namiview-prod-bucket.arn}/*"
+          data.aws_s3_bucket.namiview_prod_bucket.arn,
+          "${data.aws_s3_bucket.namiview_prod_bucket.arn}/*"
         ]
       }
     ]

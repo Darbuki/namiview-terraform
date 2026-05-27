@@ -2,35 +2,8 @@ data "aws_s3_bucket" "namiview_dev_bucket" {
   bucket = "namiview-dev-bucket"
 }
 
-resource "aws_sqs_queue" "jobs_dlq_dev" {
-  name                      = "${var.cluster_name}-dev-jobs-dlq"
-  message_retention_seconds = 1209600
-}
-
-resource "aws_sqs_queue" "jobs_dev" {
-  name                       = "${var.cluster_name}-dev-jobs"
-  visibility_timeout_seconds = 300
-  message_retention_seconds  = 345600
-
-  redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.jobs_dlq_dev.arn
-    maxReceiveCount     = 3
-  })
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "namiview_dev" {
-  bucket = data.aws_s3_bucket.namiview_dev_bucket.id
-
-  rule {
-    id     = "expire-pending"
-    status = "Enabled"
-    filter {
-      prefix = "pending/"
-    }
-    expiration {
-      days = 1
-    }
-  }
+data "aws_sqs_queue" "jobs_dev" {
+  name = "${var.cluster_name}-dev-jobs"
 }
 
 module "api_irsa_dev" {
@@ -83,7 +56,7 @@ resource "aws_iam_role_policy" "api_dev_jobs_access" {
         "sqs:GetQueueUrl",
         "sqs:GetQueueAttributes",
       ]
-      Resource = aws_sqs_queue.jobs_dev.arn
+      Resource = data.aws_sqs_queue.jobs_dev.arn
     }]
   })
 }
@@ -117,7 +90,7 @@ resource "aws_iam_role_policy" "worker_dev_sqs_access" {
         "sqs:GetQueueUrl",
         "sqs:GetQueueAttributes",
       ]
-      Resource = aws_sqs_queue.jobs_dev.arn
+      Resource = data.aws_sqs_queue.jobs_dev.arn
     }]
   })
 }
