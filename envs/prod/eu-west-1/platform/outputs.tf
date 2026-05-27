@@ -1,7 +1,3 @@
-output "github_actions_role_arn" {
-  value = aws_iam_role.github_actions.arn
-}
-
 output "s3_bucket_name" {
   value = data.aws_s3_bucket.namiview_prod_bucket.bucket
 }

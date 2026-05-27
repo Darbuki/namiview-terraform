@@ -1,4 +1,9 @@
 # --- GitHub OIDC for CI/CD ---
+#
+# Lives in foundation so the OIDC provider + CI roles survive the EKS
+# teardown. Every CI workflow in the org (terraform.yml, terraform-foundation.yml,
+# the namiview app build pipelines) assumes one of these roles via the OIDC
+# trust — destroying them would break all CI immediately.
 
 resource "aws_iam_openid_connect_provider" "github" {
   url             = "https://token.actions.githubusercontent.com"

@@ -75,3 +75,18 @@ output "ecr_repository_urls" {
     { for k, v in aws_ecr_repository.mutable : k => v.repository_url }
   )
 }
+
+output "github_actions_role_arn" {
+  description = "ARN of the namiview-terraform-ci role assumed by CI via GitHub OIDC. Consumed by the AWS_ROLE_ARN GitHub secret."
+  value       = aws_iam_role.github_actions.arn
+}
+
+output "namiview_app_ci_role_arn" {
+  description = "ARN of the namiview-app-ci role assumed by the namiview app/base/agents repos' build workflows for ECR push."
+  value       = aws_iam_role.namiview_app_ci.arn
+}
+
+output "github_oidc_provider_arn" {
+  description = "ARN of the shared GitHub Actions OIDC provider."
+  value       = aws_iam_openid_connect_provider.github.arn
+}
