@@ -180,7 +180,16 @@ resource "aws_iam_policy" "github_actions_ci" {
           "iam:ListInstanceProfilesForRole",
           "iam:CreateServiceLinkedRole",
           "iam:CreateInstanceProfile", "iam:DeleteInstanceProfile", "iam:GetInstanceProfile",
-          "iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile"
+          "iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile",
+          # IAM user actions — needed since `aws_iam_user.homelab_prod`
+          # (+ its access key + inline policy) lives in foundation/iam-homelab.tf.
+          # Without these, CI plan fails on the initial refresh with
+          # `iam:GetUser AccessDenied`.
+          "iam:CreateUser", "iam:DeleteUser", "iam:GetUser", "iam:UpdateUser",
+          "iam:TagUser", "iam:UntagUser", "iam:ListUserTags",
+          "iam:PutUserPolicy", "iam:GetUserPolicy", "iam:DeleteUserPolicy", "iam:ListUserPolicies",
+          "iam:AttachUserPolicy", "iam:DetachUserPolicy", "iam:ListAttachedUserPolicies",
+          "iam:CreateAccessKey", "iam:DeleteAccessKey", "iam:UpdateAccessKey", "iam:GetAccessKeyLastUsed", "iam:ListAccessKeys",
         ]
         Resource = "*"
       },
