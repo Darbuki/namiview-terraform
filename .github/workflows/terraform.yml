@@ -1,8 +1,12 @@
 name: Terraform (platform)
 
 # Platform layer — the EKS cluster and everything around it (VPC, ALB,
-# Karpenter, ArgoCD, GH OIDC role, S3 app bucket). Rebuildable on EKS
-# teardown. See envs/prod/eu-west-1/foundation/ for the persistent layer.
+# Karpenter, ArgoCD). Rebuildable on EKS teardown. See
+# envs/prod/eu-west-1/foundation/ for the persistent layer.
+#
+# Runs on ubuntu-latest (was arc-runner-set-terraform, which dies with EKS).
+# Keeps the platform workflow usable both during the hybrid window and if
+# EKS is ever rebuilt later.
 
 on:
   push:
@@ -34,6 +38,7 @@ permissions:
 env:
   TF_WORKING_DIR: envs/prod/eu-west-1/platform
   AWS_REGION: eu-west-1
+  EKS_CLUSTER_NAME: namiview-prod
 
 concurrency:
   group: terraform-platform-prod-eu-west-1
@@ -41,7 +46,7 @@ concurrency:
 
 jobs:
   plan:
-    runs-on: arc-runner-set-terraform
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ${{ env.TF_WORKING_DIR }}
@@ -49,18 +54,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install AWS CLI
-        run: |
-          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscli.zip
-          unzip -q awscli.zip
-          sudo ./aws/install
-          rm -rf awscli.zip aws
-
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
+
+      # Platform has kubernetes + helm providers; they need a kubeconfig
+      # pointing at the EKS cluster. Best-effort: if the cluster is gone
+      # (post-decommission window), TF will fail clearly on the k8s/helm
+      # resources — which is the correct signal.
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ env.AWS_REGION }} \
+            --name ${{ env.EKS_CLUSTER_NAME }} \
+            || echo "EKS cluster not reachable — TF will fail on k8s providers if any are in plan"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -70,24 +79,35 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: terraform validate
+
       - name: Terraform Plan
         if: github.event.inputs.action != 'destroy'
-        run: terraform plan -out=tfplan
+        run: terraform plan -out=tfplan -input=false
 
       - name: Terraform Plan (Destroy)
         if: github.event.inputs.action == 'destroy'
-        run: terraform plan -destroy -out=tfplan
+        run: terraform plan -destroy -out=tfplan -input=false
 
       - name: Upload Plan
         uses: actions/upload-artifact@v4
         with:
-          name: tfplan
+          name: tfplan-platform
           path: ${{ env.TF_WORKING_DIR }}/tfplan
+          retention-days: 7
 
   apply:
     needs: plan
-    if: github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'
-    runs-on: arc-runner-set-terraform
+    # Auto-apply on merge to main. workflow_dispatch retained for both
+    # explicit apply (rollback re-application) and destroy (D-day path).
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'apply' || github.event.inputs.action == 'destroy'))
+    runs-on: ubuntu-latest
     environment: production
     defaults:
       run:
@@ -96,18 +116,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install AWS CLI
-        run: |
-          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscli.zip
-          unzip -q awscli.zip
-          sudo ./aws/install
-          rm -rf awscli.zip aws
-
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ env.AWS_REGION }} \
+            --name ${{ env.EKS_CLUSTER_NAME }} \
+            || echo "EKS cluster not reachable — TF will fail on k8s providers if any are in plan"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -120,8 +140,8 @@ jobs:
       - name: Download Plan
         uses: actions/download-artifact@v4
         with:
-          name: tfplan
+          name: tfplan-platform
           path: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve -input=false tfplan
