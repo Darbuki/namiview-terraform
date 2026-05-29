@@ -90,7 +90,11 @@ jobs:
 
   apply:
     needs: plan
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply'
+    # Auto-apply on merge to main. workflow_dispatch retained as an escape
+    # hatch (e.g., re-applying after a manual rollback).
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'apply')
     runs-on: ubuntu-latest
     environment: production
     defaults:
