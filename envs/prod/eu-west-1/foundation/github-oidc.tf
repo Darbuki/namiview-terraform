@@ -78,6 +78,7 @@ resource "aws_iam_policy" "github_actions_ci" {
           "ec2:AuthorizeSecurityGroupEgress", "ec2:RevokeSecurityGroupEgress",
           "ec2:CreateTags", "ec2:DeleteTags",
           "ec2:CreateLaunchTemplate", "ec2:DeleteLaunchTemplate", "ec2:CreateLaunchTemplateVersion",
+          "ec2:ModifyLaunchTemplate",
           "ec2:RunInstances", "ec2:TerminateInstances"
         ]
         Resource = "*"
@@ -153,6 +154,38 @@ resource "aws_iam_policy" "github_actions_ci" {
           "s3:ListMultipartUploadParts",
         ]
         Resource = "arn:aws:s3:::namiview-loki-logs/*"
+      },
+      {
+        Sid    = "S3Ml"
+        Effect = "Allow"
+        Action = [
+          "s3:CreateBucket", "s3:DeleteBucket", "s3:ListBucket",
+          "s3:ListBucketMultipartUploads", "s3:GetBucketLocation",
+          "s3:GetBucketPolicy", "s3:PutBucketPolicy", "s3:DeleteBucketPolicy", "s3:GetBucketPolicyStatus",
+          "s3:GetBucketAcl", "s3:PutBucketAcl", "s3:GetBucketCORS", "s3:PutBucketCORS",
+          "s3:GetBucketWebsite", "s3:GetBucketVersioning", "s3:PutBucketVersioning",
+          "s3:GetBucketRequestPayment", "s3:PutBucketRequestPayment",
+          "s3:GetBucketLogging", "s3:PutBucketLogging",
+          "s3:GetAccelerateConfiguration", "s3:PutAccelerateConfiguration",
+          "s3:GetEncryptionConfiguration", "s3:PutEncryptionConfiguration",
+          "s3:GetLifecycleConfiguration", "s3:PutLifecycleConfiguration",
+          "s3:GetReplicationConfiguration",
+          "s3:GetBucketObjectLockConfiguration", "s3:PutBucketObjectLockConfiguration",
+          "s3:GetBucketOwnershipControls", "s3:PutBucketOwnershipControls",
+          "s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock",
+          "s3:GetBucketNotification", "s3:PutBucketNotification",
+          "s3:GetBucketTagging", "s3:PutBucketTagging"
+        ]
+        Resource = "arn:aws:s3:::namiview-ml"
+      },
+      {
+        Sid    = "S3MlObjects"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject", "s3:PutObject", "s3:DeleteObject",
+          "s3:AbortMultipartUpload", "s3:ListMultipartUploadParts",
+        ]
+        Resource = "arn:aws:s3:::namiview-ml/*"
       },
       {
         Sid    = "S3State"

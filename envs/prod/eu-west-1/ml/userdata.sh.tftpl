@@ -1,0 +1,22 @@
+#!/bin/bash
+set -uo pipefail
+exec > >(tee /var/log/nami-train.log) 2>&1
+
+# Watchdog first: even a wedged run can't outlive this.
+shutdown -h +${max_run_minutes}
+
+RUN_ID="$(date +%Y%m%d-%H%M%S)"
+BUCKET="${bucket}"
+echo "=== nami-train run $RUN_ID ==="
+
+aws s3 cp "s3://$BUCKET/code/run.tar.gz" /opt/run.tar.gz
+mkdir -p /opt/nami
+tar -xzf /opt/run.tar.gz -C /opt/nami
+cd /opt/nami
+
+RC=0
+bash ml/train/entry.sh "$BUCKET" "$RUN_ID" || RC=$?
+echo "=== entry.sh exit=$RC ==="
+
+aws s3 cp /var/log/nami-train.log "s3://$BUCKET/runs/$RUN_ID/train.log" || true
+shutdown -h now
