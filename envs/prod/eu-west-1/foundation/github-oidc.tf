@@ -315,6 +315,21 @@ resource "aws_iam_policy" "github_actions_ci_ml" {
           "s3:AbortMultipartUpload", "s3:ListMultipartUploadParts",
         ]
         Resource = "arn:aws:s3:::namiview-ml/*"
+      },
+      # Tagging the ml-train instance profile uses iam:TagInstanceProfile
+      # (not ec2:CreateTags), and the public subnet needs ModifySubnetAttribute
+      # for map_public_ip_on_launch — neither is in the main CI policy.
+      {
+        Sid      = "Ec2MlSubnet"
+        Effect   = "Allow"
+        Action   = ["ec2:ModifySubnetAttribute"]
+        Resource = "*"
+      },
+      {
+        Sid      = "IamMlInstanceProfile"
+        Effect   = "Allow"
+        Action   = ["iam:TagInstanceProfile", "iam:UntagInstanceProfile"]
+        Resource = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:instance-profile/namiview-ml-train"
       }
     ]
   })
