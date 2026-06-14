@@ -156,38 +156,6 @@ resource "aws_iam_policy" "github_actions_ci" {
         Resource = "arn:aws:s3:::namiview-loki-logs/*"
       },
       {
-        Sid    = "S3Ml"
-        Effect = "Allow"
-        Action = [
-          "s3:CreateBucket", "s3:DeleteBucket", "s3:ListBucket",
-          "s3:ListBucketMultipartUploads", "s3:GetBucketLocation",
-          "s3:GetBucketPolicy", "s3:PutBucketPolicy", "s3:DeleteBucketPolicy", "s3:GetBucketPolicyStatus",
-          "s3:GetBucketAcl", "s3:PutBucketAcl", "s3:GetBucketCORS", "s3:PutBucketCORS",
-          "s3:GetBucketWebsite", "s3:GetBucketVersioning", "s3:PutBucketVersioning",
-          "s3:GetBucketRequestPayment", "s3:PutBucketRequestPayment",
-          "s3:GetBucketLogging", "s3:PutBucketLogging",
-          "s3:GetAccelerateConfiguration", "s3:PutAccelerateConfiguration",
-          "s3:GetEncryptionConfiguration", "s3:PutEncryptionConfiguration",
-          "s3:GetLifecycleConfiguration", "s3:PutLifecycleConfiguration",
-          "s3:GetReplicationConfiguration",
-          "s3:GetBucketObjectLockConfiguration", "s3:PutBucketObjectLockConfiguration",
-          "s3:GetBucketOwnershipControls", "s3:PutBucketOwnershipControls",
-          "s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock",
-          "s3:GetBucketNotification", "s3:PutBucketNotification",
-          "s3:GetBucketTagging", "s3:PutBucketTagging"
-        ]
-        Resource = "arn:aws:s3:::namiview-ml"
-      },
-      {
-        Sid    = "S3MlObjects"
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject", "s3:PutObject", "s3:DeleteObject",
-          "s3:AbortMultipartUpload", "s3:ListMultipartUploadParts",
-        ]
-        Resource = "arn:aws:s3:::namiview-ml/*"
-      },
-      {
         Sid    = "S3State"
         Effect = "Allow"
         Action = [
@@ -304,6 +272,57 @@ resource "aws_iam_policy" "github_actions_ci" {
 resource "aws_iam_role_policy_attachment" "github_actions_ci" {
   role       = aws_iam_role.github_actions.name
   policy_arn = aws_iam_policy.github_actions_ci.arn
+}
+
+# ML-rig grants live in their OWN managed policy: the main policy renders to
+# ~5.6k of AWS's hard 6,144 non-whitespace-char limit — appending these sids
+# pushed it to ~6.9k, and CreatePolicyVersion then fails with LimitExceeded,
+# which the provider retries forever ("Still modifying..."). Keep this split.
+resource "aws_iam_policy" "github_actions_ci_ml" {
+  name = "namiview-terraform-ci-ml"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "S3Ml"
+        Effect = "Allow"
+        Action = [
+          "s3:CreateBucket", "s3:DeleteBucket", "s3:ListBucket",
+          "s3:ListBucketMultipartUploads", "s3:GetBucketLocation",
+          "s3:GetBucketPolicy", "s3:PutBucketPolicy", "s3:DeleteBucketPolicy", "s3:GetBucketPolicyStatus",
+          "s3:GetBucketAcl", "s3:PutBucketAcl", "s3:GetBucketCORS", "s3:PutBucketCORS",
+          "s3:GetBucketWebsite", "s3:GetBucketVersioning", "s3:PutBucketVersioning",
+          "s3:GetBucketRequestPayment", "s3:PutBucketRequestPayment",
+          "s3:GetBucketLogging", "s3:PutBucketLogging",
+          "s3:GetAccelerateConfiguration", "s3:PutAccelerateConfiguration",
+          "s3:GetEncryptionConfiguration", "s3:PutEncryptionConfiguration",
+          "s3:GetLifecycleConfiguration", "s3:PutLifecycleConfiguration",
+          "s3:GetReplicationConfiguration",
+          "s3:GetBucketObjectLockConfiguration", "s3:PutBucketObjectLockConfiguration",
+          "s3:GetBucketOwnershipControls", "s3:PutBucketOwnershipControls",
+          "s3:GetBucketPublicAccessBlock", "s3:PutBucketPublicAccessBlock",
+          "s3:GetBucketNotification", "s3:PutBucketNotification",
+          "s3:GetBucketTagging", "s3:PutBucketTagging"
+        ]
+        Resource = "arn:aws:s3:::namiview-ml"
+      },
+      {
+        Sid    = "S3MlObjects"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject", "s3:PutObject", "s3:DeleteObject",
+          "s3:AbortMultipartUpload", "s3:ListMultipartUploadParts",
+        ]
+        Resource = "arn:aws:s3:::namiview-ml/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_ci_ml" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = aws_iam_policy.github_actions_ci_ml.arn
 }
 
 # --- GitHub OIDC for namiview app repo → ECR push ---
