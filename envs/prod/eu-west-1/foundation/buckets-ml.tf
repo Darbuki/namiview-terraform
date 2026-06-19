@@ -31,6 +31,19 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "ml" {
   }
 }
 
+# Versioning makes deletes/overwrites recoverable. Matters because the forge
+# launch grant (iam-forge-launch.tf) lets the agent run a box carrying the
+# ml-train role, which holds s3:DeleteObject on this bucket — without versioning,
+# an accidental or hostile wipe of the datasets/code/checkpoints is unrecoverable.
+# Also covers plain operator error. Old versions are reaped after 30d (below).
+resource "aws_s3_bucket_versioning" "ml" {
+  bucket = aws_s3_bucket.ml.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_lifecycle_configuration" "ml" {
   bucket = aws_s3_bucket.ml.id
 
@@ -43,6 +56,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "ml" {
 
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
+    }
+  }
+
+  # Bound the cost of versioning: keep a 30-day recovery window, then purge
+  # superseded/deleted versions.
+  rule {
+    id     = "expire-noncurrent-versions"
+    status = "Enabled"
+
+    filter {}
+
+    noncurrent_version_expiration {
+      noncurrent_days = 30
     }
   }
 }
