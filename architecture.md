@@ -1,5 +1,11 @@
 # Namiview EKS Infrastructure
 
+> **⚠️ HISTORICAL — this describes the retired EKS stack.** The live platform is the
+> homelab cluster + AWS-managed services; for the current topology see
+> `namiview/docs/architecture-current.md`, and for how to bring EKS back see
+> `namiview/docs/eks-revival.md`. This doc is kept as **revival reference** for the
+> dormant `platform/` layer. *(banner added 2026-06-20)*
+
 ```mermaid
 graph TB
     subgraph Internet
