@@ -40,5 +40,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "loki" {
     expiration {
       days = 2
     }
+
+    # Loki flushes chunks as multipart uploads; an aborted/failed flush can
+    # leave orphaned MPU parts that are billed as storage indefinitely and
+    # are NOT removed by the object `expiration` rule above. Clean them up.
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
   }
 }
